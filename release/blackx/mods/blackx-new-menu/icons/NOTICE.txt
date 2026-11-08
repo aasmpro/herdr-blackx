@@ -1,0 +1,3 @@
+Lucide static 1.70.0
+Source: https://registry.npmjs.org/lucide-static/-/lucide-static-1.70.0.tgz
+SVG files are unmodified. See LICENSE.

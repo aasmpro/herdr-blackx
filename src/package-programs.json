@@ -1,0 +1,629 @@
+{
+  "programs": {
+    "curl": {
+      "icon": "mods/blackx-chrome/icons/app-window.svg",
+      "tint": true,
+      "color": "#eeeeee"
+    },
+    "gemini": {
+      "icon": "mods/blackx-chrome/icons/bot.svg",
+      "tint": true,
+      "color": "#eeeeee"
+    },
+    "poetry": {
+      "icon": "mods/blackx-chrome/icons/app-window.svg",
+      "tint": true,
+      "color": "#eeeeee"
+    },
+    "pnpm": {
+      "icon": "mods/blackx-chrome/icons/app-window.svg",
+      "tint": true,
+      "color": "#eeeeee"
+    },
+    "kiro": {
+      "icon": "mods/blackx-chrome/icons/app-window.svg",
+      "tint": true,
+      "color": "#eeeeee"
+    },
+    "nvim": {
+      "icon": "mods/blackx-chrome/icons/app-window.svg",
+      "tint": true,
+      "color": "#eeeeee"
+    },
+    "claude": {
+      "icon": "mods/blackx-chrome/icons/brand-claude.svg",
+      "tint": true,
+      "color": "#eeeeee"
+    },
+    "pi": {
+      "icon": "mods/blackx-chrome/icons/brand-pi.svg",
+      "tint": true,
+      "color": "#eeeeee"
+    },
+    "hx": {
+      "icon": "mods/blackx-chrome/icons/app-window.svg",
+      "tint": true,
+      "color": "#eeeeee"
+    },
+    "command-code": {
+      "icon": "mods/blackx-chrome/icons/app-window.svg",
+      "tint": true,
+      "color": "#eeeeee"
+    },
+    "turbo": {
+      "icon": "mods/blackx-chrome/icons/app-window.svg",
+      "tint": true,
+      "color": "#eeeeee"
+    },
+    "webpack": {
+      "icon": "mods/blackx-chrome/icons/app-window.svg",
+      "tint": true,
+      "color": "#eeeeee"
+    },
+    "psql": {
+      "icon": "mods/blackx-chrome/icons/app-window.svg",
+      "tint": true,
+      "color": "#eeeeee"
+    },
+    "ruff": {
+      "icon": "mods/blackx-chrome/icons/app-window.svg",
+      "tint": true,
+      "color": "#eeeeee"
+    },
+    "jupyter": {
+      "icon": "mods/blackx-chrome/icons/app-window.svg",
+      "tint": true,
+      "color": "#eeeeee"
+    },
+    "vitest": {
+      "icon": "mods/blackx-chrome/icons/app-window.svg",
+      "tint": true,
+      "color": "#eeeeee"
+    },
+    "prime-agent": {
+      "icon": "mods/blackx-chrome/icons/app-window.svg",
+      "tint": true,
+      "color": "#eeeeee"
+    },
+    "supabase": {
+      "icon": "mods/blackx-chrome/icons/app-window.svg",
+      "tint": true,
+      "color": "#eeeeee"
+    },
+    "java": {
+      "icon": "mods/blackx-chrome/icons/app-window.svg",
+      "tint": true,
+      "color": "#eeeeee"
+    },
+    "rg": {
+      "icon": "mods/blackx-chrome/icons/app-window.svg",
+      "tint": true,
+      "color": "#eeeeee"
+    },
+    "netlify": {
+      "icon": "mods/blackx-chrome/icons/app-window.svg",
+      "tint": true,
+      "color": "#eeeeee"
+    },
+    "expo": {
+      "icon": "mods/blackx-chrome/icons/app-window.svg",
+      "tint": true,
+      "color": "#eeeeee"
+    },
+    "antigravity": {
+      "icon": "mods/blackx-chrome/icons/app-window.svg",
+      "tint": true,
+      "color": "#eeeeee"
+    },
+    "mvn": {
+      "icon": "mods/blackx-chrome/icons/app-window.svg",
+      "tint": true,
+      "color": "#eeeeee"
+    },
+    "kubectl": {
+      "icon": "mods/blackx-chrome/icons/app-window.svg",
+      "tint": true,
+      "color": "#eeeeee"
+    },
+    "helm": {
+      "icon": "mods/blackx-chrome/icons/app-window.svg",
+      "tint": true,
+      "color": "#eeeeee"
+    },
+    "biome": {
+      "icon": "mods/blackx-chrome/icons/app-window.svg",
+      "tint": true,
+      "color": "#eeeeee"
+    },
+    "gcloud": {
+      "icon": "mods/blackx-chrome/icons/app-window.svg",
+      "tint": true,
+      "color": "#eeeeee"
+    },
+    "copilot": {
+      "icon": "mods/blackx-chrome/icons/bot.svg",
+      "tint": true,
+      "color": "#eeeeee"
+    },
+    "nix": {
+      "icon": "mods/blackx-chrome/icons/app-window.svg",
+      "tint": true,
+      "color": "#eeeeee"
+    },
+    "npm": {
+      "icon": "mods/blackx-chrome/icons/app-window.svg",
+      "tint": true,
+      "color": "#eeeeee"
+    },
+    "wrangler": {
+      "icon": "mods/blackx-chrome/icons/app-window.svg",
+      "tint": true,
+      "color": "#eeeeee"
+    },
+    "nuxt": {
+      "icon": "mods/blackx-chrome/icons/app-window.svg",
+      "tint": true,
+      "color": "#eeeeee"
+    },
+    "zig": {
+      "icon": "mods/blackx-chrome/icons/app-window.svg",
+      "tint": true,
+      "color": "#eeeeee"
+    },
+    "scala": {
+      "icon": "mods/blackx-chrome/icons/app-window.svg",
+      "tint": true,
+      "color": "#eeeeee"
+    },
+    "perl": {
+      "icon": "mods/blackx-chrome/icons/app-window.svg",
+      "tint": true,
+      "color": "#eeeeee"
+    },
+    "shell": {
+      "icon": "mods/blackx-chrome/icons/terminal.svg",
+      "tint": true,
+      "color": "#eeeeee"
+    },
+    "flutter": {
+      "icon": "mods/blackx-chrome/icons/app-window.svg",
+      "tint": true,
+      "color": "#eeeeee"
+    },
+    "redis-cli": {
+      "icon": "mods/blackx-chrome/icons/app-window.svg",
+      "tint": true,
+      "color": "#eeeeee"
+    },
+    "dnf": {
+      "icon": "mods/blackx-chrome/icons/app-window.svg",
+      "tint": true,
+      "color": "#eeeeee"
+    },
+    "ruby": {
+      "icon": "mods/blackx-chrome/icons/app-window.svg",
+      "tint": true,
+      "color": "#eeeeee"
+    },
+    "fly": {
+      "icon": "mods/blackx-chrome/icons/app-window.svg",
+      "tint": true,
+      "color": "#eeeeee"
+    },
+    "python": {
+      "icon": "mods/blackx-chrome/icons/app-window.svg",
+      "tint": true,
+      "color": "#eeeeee"
+    },
+    "dsh-tui": {
+      "icon": "mods/blackx-chrome/icons/app-window.svg",
+      "tint": true,
+      "color": "#eeeeee"
+    },
+    "make": {
+      "icon": "mods/blackx-chrome/icons/app-window.svg",
+      "tint": true,
+      "color": "#eeeeee"
+    },
+    "iex": {
+      "icon": "mods/blackx-chrome/icons/app-window.svg",
+      "tint": true,
+      "color": "#eeeeee"
+    },
+    "docker": {
+      "icon": "mods/blackx-chrome/icons/app-window.svg",
+      "tint": true,
+      "color": "#eeeeee"
+    },
+    "git": {
+      "icon": "mods/blackx-chrome/icons/app-window.svg",
+      "tint": true,
+      "color": "#eeeeee"
+    },
+    "agent": {
+      "icon": "mods/blackx-chrome/icons/bot.svg",
+      "tint": true,
+      "color": "#eeeeee"
+    },
+    "apt": {
+      "icon": "mods/blackx-chrome/icons/app-window.svg",
+      "tint": true,
+      "color": "#eeeeee"
+    },
+    "uv": {
+      "icon": "mods/blackx-chrome/icons/app-window.svg",
+      "tint": true,
+      "color": "#eeeeee"
+    },
+    "kimi": {
+      "icon": "mods/blackx-chrome/icons/app-window.svg",
+      "tint": true,
+      "color": "#eeeeee"
+    },
+    "vim": {
+      "icon": "mods/blackx-chrome/icons/app-window.svg",
+      "tint": true,
+      "color": "#eeeeee"
+    },
+    "cursor": {
+      "icon": "mods/blackx-chrome/icons/bot.svg",
+      "tint": true,
+      "color": "#eeeeee"
+    },
+    "tsc": {
+      "icon": "mods/blackx-chrome/icons/app-window.svg",
+      "tint": true,
+      "color": "#eeeeee"
+    },
+    "vite": {
+      "icon": "mods/blackx-chrome/icons/app-window.svg",
+      "tint": true,
+      "color": "#eeeeee"
+    },
+    "bun": {
+      "icon": "mods/blackx-chrome/icons/app-window.svg",
+      "tint": true,
+      "color": "#eeeeee"
+    },
+    "erl": {
+      "icon": "mods/blackx-chrome/icons/app-window.svg",
+      "tint": true,
+      "color": "#eeeeee"
+    },
+    "flask": {
+      "icon": "mods/blackx-chrome/icons/app-window.svg",
+      "tint": true,
+      "color": "#eeeeee"
+    },
+    "lua": {
+      "icon": "mods/blackx-chrome/icons/app-window.svg",
+      "tint": true,
+      "color": "#eeeeee"
+    },
+    "crush": {
+      "icon": "mods/blackx-chrome/icons/app-window.svg",
+      "tint": true,
+      "color": "#eeeeee"
+    },
+    "electron": {
+      "icon": "mods/blackx-chrome/icons/app-window.svg",
+      "tint": true,
+      "color": "#eeeeee"
+    },
+    "nano": {
+      "icon": "mods/blackx-chrome/icons/app-window.svg",
+      "tint": true,
+      "color": "#eeeeee"
+    },
+    "kotlin": {
+      "icon": "mods/blackx-chrome/icons/app-window.svg",
+      "tint": true,
+      "color": "#eeeeee"
+    },
+    "mongosh": {
+      "icon": "mods/blackx-chrome/icons/app-window.svg",
+      "tint": true,
+      "color": "#eeeeee"
+    },
+    "mastracode": {
+      "icon": "mods/blackx-chrome/icons/app-window.svg",
+      "tint": true,
+      "color": "#eeeeee"
+    },
+    "prettier": {
+      "icon": "mods/blackx-chrome/icons/app-window.svg",
+      "tint": true,
+      "color": "#eeeeee"
+    },
+    "caddy": {
+      "icon": "mods/blackx-chrome/icons/app-window.svg",
+      "tint": true,
+      "color": "#eeeeee"
+    },
+    "codex": {
+      "icon": "mods/blackx-chrome/icons/brand-codex.svg",
+      "tint": true,
+      "color": "#eeeeee"
+    },
+    "terraform": {
+      "icon": "mods/blackx-chrome/icons/app-window.svg",
+      "tint": true,
+      "color": "#eeeeee"
+    },
+    "fastapi": {
+      "icon": "mods/blackx-chrome/icons/app-window.svg",
+      "tint": true,
+      "color": "#eeeeee"
+    },
+    "tmux": {
+      "icon": "mods/blackx-chrome/icons/app-window.svg",
+      "tint": true,
+      "color": "#eeeeee"
+    },
+    "yarn": {
+      "icon": "mods/blackx-chrome/icons/app-window.svg",
+      "tint": true,
+      "color": "#eeeeee"
+    },
+    "r": {
+      "icon": "mods/blackx-chrome/icons/app-window.svg",
+      "tint": true,
+      "color": "#eeeeee"
+    },
+    "lazygit": {
+      "icon": "mods/blackx-chrome/icons/app-window.svg",
+      "tint": true,
+      "color": "#eeeeee"
+    },
+    "ocaml": {
+      "icon": "mods/blackx-chrome/icons/app-window.svg",
+      "tint": true,
+      "color": "#eeeeee"
+    },
+    "dart": {
+      "icon": "mods/blackx-chrome/icons/app-window.svg",
+      "tint": true,
+      "color": "#eeeeee"
+    },
+    "pig": {
+      "icon": "mods/blackx-chrome/icons/app-window.svg",
+      "tint": true,
+      "color": "#eeeeee"
+    },
+    "pacman": {
+      "icon": "mods/blackx-chrome/icons/app-window.svg",
+      "tint": true,
+      "color": "#eeeeee"
+    },
+    "julia": {
+      "icon": "mods/blackx-chrome/icons/app-window.svg",
+      "tint": true,
+      "color": "#eeeeee"
+    },
+    "eslint": {
+      "icon": "mods/blackx-chrome/icons/app-window.svg",
+      "tint": true,
+      "color": "#eeeeee"
+    },
+    "jest": {
+      "icon": "mods/blackx-chrome/icons/app-window.svg",
+      "tint": true,
+      "color": "#eeeeee"
+    },
+    "php": {
+      "icon": "mods/blackx-chrome/icons/app-window.svg",
+      "tint": true,
+      "color": "#eeeeee"
+    },
+    "opencode": {
+      "icon": "mods/blackx-chrome/icons/brand-opencode.svg",
+      "tint": true,
+      "color": "#eeeeee"
+    },
+    "vercel": {
+      "icon": "mods/blackx-chrome/icons/app-window.svg",
+      "tint": true,
+      "color": "#eeeeee"
+    },
+    "grok": {
+      "icon": "mods/blackx-chrome/icons/app-window.svg",
+      "tint": true,
+      "color": "#eeeeee"
+    },
+    "next": {
+      "icon": "mods/blackx-chrome/icons/app-window.svg",
+      "tint": true,
+      "color": "#eeeeee"
+    },
+    "dotnet": {
+      "icon": "mods/blackx-chrome/icons/app-window.svg",
+      "tint": true,
+      "color": "#eeeeee"
+    },
+    "program": {
+      "icon": "mods/blackx-chrome/icons/app-window.svg",
+      "tint": true,
+      "color": "#eeeeee"
+    },
+    "hermes": {
+      "icon": "mods/blackx-chrome/icons/app-window.svg",
+      "tint": true,
+      "color": "#eeeeee"
+    },
+    "pytest": {
+      "icon": "mods/blackx-chrome/icons/app-window.svg",
+      "tint": true,
+      "color": "#eeeeee"
+    },
+    "glab": {
+      "icon": "mods/blackx-chrome/icons/app-window.svg",
+      "tint": true,
+      "color": "#eeeeee"
+    },
+    "gh": {
+      "icon": "mods/blackx-chrome/icons/app-window.svg",
+      "tint": true,
+      "color": "#eeeeee"
+    },
+    "qoder": {
+      "icon": "mods/blackx-chrome/icons/app-window.svg",
+      "tint": true,
+      "color": "#eeeeee"
+    },
+    "astro": {
+      "icon": "mods/blackx-chrome/icons/app-window.svg",
+      "tint": true,
+      "color": "#eeeeee"
+    },
+    "htop": {
+      "icon": "mods/blackx-chrome/icons/app-window.svg",
+      "tint": true,
+      "color": "#eeeeee"
+    },
+    "muse": {
+      "icon": "mods/blackx-chrome/icons/app-window.svg",
+      "tint": true,
+      "color": "#eeeeee"
+    },
+    "ffmpeg": {
+      "icon": "mods/blackx-chrome/icons/app-window.svg",
+      "tint": true,
+      "color": "#eeeeee"
+    },
+    "podman": {
+      "icon": "mods/blackx-chrome/icons/app-window.svg",
+      "tint": true,
+      "color": "#eeeeee"
+    },
+    "less": {
+      "icon": "mods/blackx-chrome/icons/app-window.svg",
+      "tint": true,
+      "color": "#eeeeee"
+    },
+    "swift": {
+      "icon": "mods/blackx-chrome/icons/app-window.svg",
+      "tint": true,
+      "color": "#eeeeee"
+    },
+    "cmake": {
+      "icon": "mods/blackx-chrome/icons/app-window.svg",
+      "tint": true,
+      "color": "#eeeeee"
+    },
+    "ansible": {
+      "icon": "mods/blackx-chrome/icons/app-window.svg",
+      "tint": true,
+      "color": "#eeeeee"
+    },
+    "brew": {
+      "icon": "mods/blackx-chrome/icons/app-window.svg",
+      "tint": true,
+      "color": "#eeeeee"
+    },
+    "ollama": {
+      "icon": "mods/blackx-chrome/icons/app-window.svg",
+      "tint": true,
+      "color": "#eeeeee"
+    },
+    "cargo": {
+      "icon": "mods/blackx-chrome/icons/app-window.svg",
+      "tint": true,
+      "color": "#eeeeee"
+    },
+    "sqlite3": {
+      "icon": "mods/blackx-chrome/icons/app-window.svg",
+      "tint": true,
+      "color": "#eeeeee"
+    },
+    "esbuild": {
+      "icon": "mods/blackx-chrome/icons/app-window.svg",
+      "tint": true,
+      "color": "#eeeeee"
+    },
+    "ssh": {
+      "icon": "mods/blackx-chrome/icons/app-window.svg",
+      "tint": true,
+      "color": "#eeeeee"
+    },
+    "amp": {
+      "icon": "mods/blackx-chrome/icons/app-window.svg",
+      "tint": true,
+      "color": "#eeeeee"
+    },
+    "deno": {
+      "icon": "mods/blackx-chrome/icons/app-window.svg",
+      "tint": true,
+      "color": "#eeeeee"
+    },
+    "mysql": {
+      "icon": "mods/blackx-chrome/icons/app-window.svg",
+      "tint": true,
+      "color": "#eeeeee"
+    },
+    "tauri": {
+      "icon": "mods/blackx-chrome/icons/app-window.svg",
+      "tint": true,
+      "color": "#eeeeee"
+    },
+    "ghci": {
+      "icon": "mods/blackx-chrome/icons/app-window.svg",
+      "tint": true,
+      "color": "#eeeeee"
+    },
+    "nginx": {
+      "icon": "mods/blackx-chrome/icons/app-window.svg",
+      "tint": true,
+      "color": "#eeeeee"
+    },
+    "go": {
+      "icon": "mods/blackx-chrome/icons/app-window.svg",
+      "tint": true,
+      "color": "#eeeeee"
+    },
+    "prisma": {
+      "icon": "mods/blackx-chrome/icons/app-window.svg",
+      "tint": true,
+      "color": "#eeeeee"
+    },
+    "node": {
+      "icon": "mods/blackx-chrome/icons/app-window.svg",
+      "tint": true,
+      "color": "#eeeeee"
+    },
+    "composer": {
+      "icon": "mods/blackx-chrome/icons/app-window.svg",
+      "tint": true,
+      "color": "#eeeeee"
+    },
+    "emacs": {
+      "icon": "mods/blackx-chrome/icons/app-window.svg",
+      "tint": true,
+      "color": "#eeeeee"
+    },
+    "django-admin": {
+      "icon": "mods/blackx-chrome/icons/app-window.svg",
+      "tint": true,
+      "color": "#eeeeee"
+    },
+    "gradle": {
+      "icon": "mods/blackx-chrome/icons/app-window.svg",
+      "tint": true,
+      "color": "#eeeeee"
+    },
+    "claude-code": {
+      "icon": "mods/blackx-chrome/icons/brand-claude.svg",
+      "tint": true,
+      "color": "#eeeeee"
+    },
+    "pi-coding-agent": {
+      "icon": "mods/blackx-chrome/icons/brand-pi.svg",
+      "tint": true,
+      "color": "#eeeeee"
+    },
+    "open-code": {
+      "icon": "mods/blackx-chrome/icons/brand-opencode.svg",
+      "tint": true,
+      "color": "#eeeeee"
+    }
+  }
+}

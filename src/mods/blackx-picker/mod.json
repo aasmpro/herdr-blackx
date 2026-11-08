@@ -1,0 +1,9 @@
+{
+  "place": "none",
+  "title": "Picker",
+  "overlay": {
+    "kind": "popup",
+    "width": 640,
+    "height": 420
+  }
+}

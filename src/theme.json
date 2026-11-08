@@ -1,0 +1,88 @@
+{
+  "background": {
+    "$ref": "colors.background"
+  },
+  "foreground": {
+    "$ref": "colors.foreground"
+  },
+  "selection": {
+    "$ref": "terminal.selection"
+  },
+  "cursor": {
+    "$ref": "terminal.cursor"
+  },
+  "ansi": {
+    "$ref": "terminal.ansi"
+  },
+  "colors": {
+    "background": {
+      "$ref": "colors.background"
+    },
+    "canvas": {
+      "$ref": "colors.canvas"
+    },
+    "chrome": {
+      "$ref": "colors.chrome"
+    },
+    "surface": {
+      "$ref": "colors.surface"
+    },
+    "popover": {
+      "$ref": "colors.popover"
+    },
+    "raised": {
+      "$ref": "colors.raised"
+    },
+    "hover": {
+      "$ref": "colors.hover"
+    },
+    "selected": {
+      "$ref": "colors.selected"
+    },
+    "border": {
+      "$ref": "colors.border"
+    },
+    "input": {
+      "$ref": "colors.input"
+    },
+    "foreground": {
+      "$ref": "colors.foreground"
+    },
+    "muted": {
+      "$ref": "colors.muted"
+    },
+    "dim": {
+      "$ref": "colors.dim"
+    },
+    "accent": {
+      "$ref": "colors.accent"
+    },
+    "accent_foreground": {
+      "$ref": "colors.accent_foreground"
+    },
+    "solid": {
+      "$ref": "colors.solid"
+    },
+    "solid_foreground": {
+      "$ref": "colors.solid_foreground"
+    },
+    "selection": {
+      "$ref": "colors.selection"
+    },
+    "working": {
+      "$ref": "colors.working"
+    },
+    "blocked": {
+      "$ref": "colors.blocked"
+    },
+    "done": {
+      "$ref": "colors.done"
+    },
+    "idle": {
+      "$ref": "colors.idle"
+    },
+    "unknown": {
+      "$ref": "colors.unknown"
+    }
+  }
+}

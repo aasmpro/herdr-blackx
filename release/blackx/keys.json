@@ -1,0 +1,12 @@
+{
+  "layout:blackx": {
+    "cmd-,": "blackx-chrome.settings",
+    "cmd-shift-p": "blackx-chrome.palette",
+    "cmd-p": "blackx-chrome.picker",
+    "cmd-w": "blackx-chrome.close-tab",
+    "f2": "blackx-chrome.rename-tab",
+    "shift-f2": "blackx-chrome.rename-space",
+    "cmd-/": "blackx-chrome.help",
+    "cmd-shift-/": "blackx-chrome.help"
+  }
+}

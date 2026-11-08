@@ -1,0 +1,90 @@
+{
+  "zoom": 1.1,
+  "sounds": {
+    "enabled": true
+  },
+  "font": {
+    "$ref": "fonts.terminal"
+  },
+  "font_size": {
+    "$ref": "fonts.size"
+  },
+  "font_ligatures": false,
+  "ui_font": {
+    "$ref": "fonts.ui"
+  },
+  "minimum_contrast": 1,
+  "appearance": "dark",
+  "theme": "blackx",
+  "colors": {
+    "accent": {
+      "$ref": "colors.accent"
+    },
+    "accent_foreground": {
+      "$ref": "colors.accent_foreground"
+    },
+    "background": {
+      "$ref": "colors.background"
+    },
+    "blocked": {
+      "$ref": "colors.blocked"
+    },
+    "border": {
+      "$ref": "colors.border"
+    },
+    "canvas": {
+      "$ref": "colors.canvas"
+    },
+    "chrome": {
+      "$ref": "colors.chrome"
+    },
+    "dim": {
+      "$ref": "colors.dim"
+    },
+    "done": {
+      "$ref": "colors.done"
+    },
+    "foreground": {
+      "$ref": "colors.foreground"
+    },
+    "hover": {
+      "$ref": "colors.hover"
+    },
+    "idle": {
+      "$ref": "colors.idle"
+    },
+    "input": {
+      "$ref": "colors.input"
+    },
+    "muted": {
+      "$ref": "colors.muted"
+    },
+    "popover": {
+      "$ref": "colors.popover"
+    },
+    "raised": {
+      "$ref": "colors.raised"
+    },
+    "selected": {
+      "$ref": "colors.selected"
+    },
+    "selection": {
+      "$ref": "overrides.settingsSelection"
+    },
+    "solid": {
+      "$ref": "colors.solid"
+    },
+    "solid_foreground": {
+      "$ref": "colors.solid_foreground"
+    },
+    "surface": {
+      "$ref": "colors.surface"
+    },
+    "unknown": {
+      "$ref": "colors.unknown"
+    },
+    "working": {
+      "$ref": "colors.working"
+    }
+  }
+}

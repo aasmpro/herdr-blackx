@@ -1,0 +1,8 @@
+{
+  "place": "none",
+  "title": "Welcome",
+  "cloned_from": {
+    "name": "welcome",
+    "version": "0.1.13"
+  }
+}

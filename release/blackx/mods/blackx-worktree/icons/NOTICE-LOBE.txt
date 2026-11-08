@@ -1,0 +1,4 @@
+Lobe Icons static SVG 1.102.0
+https://github.com/lobehub/lobe-icons
+Source: https://registry.npmjs.org/@lobehub/icons-static-svg/-/icons-static-svg-1.102.0.tgz
+Unmodified monochrome Codex, Claude, Pi and opencode marks. See LICENSE-LOBE.

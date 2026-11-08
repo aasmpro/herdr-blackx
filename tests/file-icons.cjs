@@ -1,0 +1,13 @@
+const fs = require('fs'), vm = require('vm'), assert = require('assert');
+const text = fs.readFileSync(__dirname+'/../src/mods/blackx-files/file-icons.js','utf8');
+const glyph = vm.runInNewContext(text.replace('export function','function')+'\nfileGlyph;');
+assert.notEqual(glyph('test.py'),glyph('test.js'));
+assert.equal(glyph('APP.TSX'),glyph('app.jsx'));
+assert.equal(glyph('README.MD'),glyph('notes.markdown'));
+assert.notEqual(glyph('.gitignore'),glyph('unknown.xyz'));
+assert.notEqual(glyph('package.json'),glyph('data.json'));
+assert.equal(glyph('Dockerfile.dev'),glyph('Dockerfile'));
+assert.equal(glyph('.env.local'),glyph('.env'));
+assert.equal(glyph('unknown.xyz'),glyph('LICENSE'));
+assert.notEqual(glyph('folder',true,false),glyph('folder',true,true));
+console.log('File icon mapping scenarios passed.');

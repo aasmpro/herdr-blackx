@@ -1,0 +1,287 @@
+{
+  "id": "root",
+  "cloned_from": {
+    "name": "main",
+    "version": "0.1.13"
+  },
+  "type": "row",
+  "children": [
+    {
+      "id": "sidebar",
+      "type": "column",
+      "children": [
+        {
+          "id": "brand",
+          "type": "block",
+          "content": {
+            "mod": "blackx-chrome"
+          },
+          "size": {
+            "px": {
+              "$ref": "layout.brandHeight"
+            }
+          },
+          "window_drag": true
+        },
+        {
+          "id": "sidebar-lists",
+          "type": "column",
+          "children": [
+            {
+              "id": "spaces",
+              "type": "block",
+              "content": {
+                "mod": "blackx-agents"
+              },
+              "size": {
+                "weight": 1
+              },
+              "min": {
+                "$ref": "layout.spacesMinHeight"
+              }
+            }
+          ]
+        }
+      ],
+      "size": {
+        "px": {
+          "$ref": "sidebar.expanded"
+        }
+      },
+      "min": {
+        "$ref": "layout.sidebarMinWidth"
+      },
+      "max": {
+        "$ref": "layout.sidebarMaxWidth"
+      },
+      "background": "chrome",
+      "resizable": false
+    },
+    {
+      "id": "work",
+      "type": "column",
+      "children": [
+        {
+          "id": "tabs",
+          "type": "block",
+          "content": {
+            "mod": "blackx-tabs"
+          },
+          "size": {
+            "px": {
+              "$ref": "layout.tabsHeight"
+            }
+          },
+          "window_drag": true
+        },
+        {
+          "id": "work-body",
+          "type": "row",
+          "children": [
+            {
+              "id": "main",
+              "type": "block",
+              "content": {
+                "tab": "active",
+                "pane": {
+                  "header": {
+                    "content": {
+                      "mod": "blackx-pane"
+                    },
+                    "reveal": "always",
+                    "height": {
+                      "$ref": "layout.paneHeaderHeight"
+                    },
+                    "position": "top"
+                  },
+                  "background": "background",
+                  "border": {
+                    "width": {
+                      "$ref": "layout.paneBorderWidth"
+                    },
+                    "color": "border"
+                  },
+                  "focus": {
+                    "width": {
+                      "$ref": "layout.paneFocusWidth"
+                    },
+                    "color": "border"
+                  },
+                  "radius": {
+                    "$ref": "layout.paneRadius"
+                  },
+                  "gap": {
+                    "$ref": "layout.paneGap"
+                  },
+                  "lone": true
+                }
+              },
+              "background": "border"
+            },
+            {
+              "id": "panel",
+              "type": "column",
+              "children": [
+                {
+                  "id": "panel-body",
+                  "type": "stack",
+                  "children": [
+                    {
+                      "id": "files",
+                      "type": "block",
+                      "content": {
+                        "mod": "blackx-files"
+                      }
+                    },
+                    {
+                      "id": "changes",
+                      "type": "block",
+                      "content": {
+                        "mod": "blackx-changes"
+                      }
+                    }
+                  ],
+                  "active": "files"
+                }
+              ],
+              "size": {
+                "px": {
+                  "$ref": "layout.panelWidth"
+                }
+              },
+              "min": {
+                "$ref": "layout.panelMinWidth"
+              },
+              "hidden": true
+            }
+          ],
+          "padding": {
+            "$ref": "layout.workspacePadding"
+          },
+          "gap": {
+            "$ref": "layout.workspaceGap"
+          }
+        },
+        {
+          "id": "status",
+          "type": "block",
+          "content": {
+            "mod": "blackx-status"
+          },
+          "size": {
+            "px": {
+              "$ref": "layout.statusHeight"
+            }
+          }
+        }
+      ],
+      "resizable": false
+    }
+  ],
+  "background": "canvas",
+  "colors": {
+    "accent": {
+      "$ref": "colors.accent"
+    },
+    "accent_foreground": {
+      "$ref": "colors.accent_foreground"
+    },
+    "background": {
+      "$ref": "colors.background"
+    },
+    "blocked": {
+      "$ref": "colors.blocked"
+    },
+    "border": {
+      "$ref": "colors.border"
+    },
+    "canvas": {
+      "$ref": "colors.canvas"
+    },
+    "chrome": {
+      "$ref": "colors.chrome"
+    },
+    "dim": {
+      "$ref": "colors.dim"
+    },
+    "done": {
+      "$ref": "colors.done"
+    },
+    "foreground": {
+      "$ref": "colors.foreground"
+    },
+    "hover": {
+      "$ref": "colors.hover"
+    },
+    "idle": {
+      "$ref": "colors.idle"
+    },
+    "input": {
+      "$ref": "colors.input"
+    },
+    "muted": {
+      "$ref": "colors.muted"
+    },
+    "popover": {
+      "$ref": "colors.popover"
+    },
+    "raised": {
+      "$ref": "colors.raised"
+    },
+    "selected": {
+      "$ref": "colors.selected"
+    },
+    "selection": {
+      "$ref": "overrides.blackxSelection"
+    },
+    "solid": {
+      "$ref": "colors.solid"
+    },
+    "solid_foreground": {
+      "$ref": "colors.solid_foreground"
+    },
+    "surface": {
+      "$ref": "colors.surface"
+    },
+    "unknown": {
+      "$ref": "colors.unknown"
+    },
+    "working": {
+      "$ref": "colors.working"
+    }
+  },
+  "terminal_padding": [
+    {
+      "$ref": "layout.terminalPaddingVertical"
+    },
+    {
+      "$ref": "layout.terminalPaddingHorizontal"
+    }
+  ],
+  "divider": {
+    "width": {
+      "$ref": "layout.dividerWidth"
+    },
+    "color": "border"
+  },
+  "resizable": true,
+  "titlebar": "none",
+  "traffic_lights": [
+    {
+      "$ref": "layout.trafficLightsX"
+    },
+    {
+      "$ref": "layout.trafficLightsY"
+    }
+  ],
+  "terminal_menu": "blackx-menu",
+  "font": {
+    "$ref": "fonts.terminal"
+  },
+  "ui_font": {
+    "$ref": "fonts.ui"
+  },
+  "font_size": {
+    "$ref": "fonts.size"
+  }
+}

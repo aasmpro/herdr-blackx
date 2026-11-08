@@ -1,0 +1,38 @@
+{
+  "zoom": 1.1,
+  "sounds": {
+    "enabled": true
+  },
+  "font": "JetBrainsMono Nerd Font",
+  "font_size": 13,
+  "font_ligatures": false,
+  "ui_font": "JetBrainsMono Nerd Font",
+  "minimum_contrast": 1,
+  "appearance": "dark",
+  "theme": "blackx",
+  "colors": {
+    "accent": "#ffffff",
+    "accent_foreground": "#000000",
+    "background": "#000000",
+    "blocked": "#ffffff",
+    "border": "#303030",
+    "canvas": "#000000",
+    "chrome": "#000000",
+    "dim": "#777777",
+    "done": "#dddddd",
+    "foreground": "#eeeeee",
+    "hover": "#202020",
+    "idle": "#777777",
+    "input": "#606060",
+    "muted": "#aaaaaa",
+    "popover": "#101010",
+    "raised": "#181818",
+    "selected": "#282828",
+    "selection": "#282828",
+    "solid": "#eeeeee",
+    "solid_foreground": "#000000",
+    "surface": "#000000",
+    "unknown": "#999999",
+    "working": "#bbbbbb"
+  }
+}

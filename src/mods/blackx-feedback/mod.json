@@ -1,0 +1,8 @@
+{
+  "place": "none",
+  "title": "Send feedback",
+  "cloned_from": {
+    "name": "feedback",
+    "version": "0.1.13"
+  }
+}

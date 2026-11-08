@@ -1,0 +1,9 @@
+verification/
+__pycache__/
+*.pyc
+.DS_Store
+dist/
+
+# Herdr checker/editor support files are not package source.
+/release/blackx/mods/**/*.d.ts
+/release/blackx/mods/**/jsconfig.json
