@@ -1,16 +1,18 @@
+import { markdownBlocks } from "./markdown-blocks.js";
+import { parseCSV, serializeCSV } from "./csv.js";
 import { gitMarks } from "./git-status.js";
 import MarkdownContent from "./markdown-content.js";
 import { ignoredPaths } from "./git-ignore.js";
 import { writeDocument } from "./write-document.js";
 import { menu, initMenu } from "./context-menu.js";
-import { props } from "herdr";
+import { props, appHome } from "herdr";
 import { fileGlyph } from "./file-icons.js";
 import { icon as svg } from "./icons.js";
 import { dispatch as run, openStyled as openOverlay, rememberViewport } from "./routing.js";
 import { syncTextSelection, styles, typography } from "./style.js";
 // File browser with local editing, retained drafts, and conflict-safe saves.
-import {View, div} from "gpui-kit";
-import { v_flex, h_flex, Editor, EditorState } from "gpui-base";
+import {View, div, image} from "gpui-kit";
+import { v_flex, h_flex, Editor, EditorState, Textarea, TextareaState, TextView } from "gpui-base";
 import {spaces, shared, panes, focused, notify, exec, readTextFile, watchFolder, theme, settings, window, layout} from "herdr";
 
 import { location } from "./directory-context.js";
@@ -180,7 +182,7 @@ export default class Files extends View {
     if (path && path === this.file && (this.document || this.fileLoading)) { if (openEditor && this.document) this.editConfigured(cx); return; }
     const request = this.fileRequest = (this.fileRequest ?? 0) + 1;
     this.fileLoading = false;
-    this.code = null; this.document = null; this.file = path; this.fileError = null;
+    this.asset = null; this.code = null; this.document = null; this.file = path; this.fileError = null;
     const draftKey = `${this.context?.key}\n${path}`;
     const cached = this.drafts.get(draftKey);
     if (path && cached) { this.document = cached; this.code = cached.code; this.ensureMarkdown(cx); if (notify) cx?.notify(); if (openEditor) this.editConfigured(cx); return; }
@@ -188,6 +190,7 @@ export default class Files extends View {
     const context = this.context, root = this.root, on = this.on;
     this.fileLoading = true;
     if (notify) cx.notify();
+    if (/\.(png|jpe?g|webp|gif|svg|pdf)$/i.test(path)) {this.loadAsset(cx,1,request,context,`${root}/${path}`,on);return;}
     cx.spawn(async cx => {
       try {
         const text = await readTextFile(`${root}/${path}`, { on });
@@ -196,7 +199,7 @@ export default class Files extends View {
         if (text.includes("\0")) { this.fileError = "Binary file · no text preview"; return; }
         const editable = text.length <= 400000;
         this.code = this.editor(text.length > 400000 ? text.slice(0, 400000) + "\n… (file truncated)" : text, path, editable);
-        const doc = { code: this.code, baseline: text, path: `${root}/${path}`, editable, on, dirty: false, saving: false, message: editable ? "" : "Truncated preview · read only" };
+        const doc = { code: this.code, baseline: text, path: `${root}/${path}`, editable, on, preview: true, dirty: false, saving: false, message: editable ? "" : "Truncated preview · read only" };
         this.document = doc;
         this.drafts.set(draftKey, doc);
         this.ensureMarkdown(cx);
@@ -212,7 +215,7 @@ export default class Files extends View {
   editConfigured(cx) {
     const doc = this.document, context = location(), choice = shared("blackx.editor") ?? "builtin";
     if (!doc || this.editorLaunching) return;
-    if (choice === "builtin") { if (doc.editable) { doc.preview = false; this.updateMarkdown(doc); doc.code.focus(); } else doc.message = "Built-in editing is unavailable for this file."; cx.notify(); return; }
+    if (choice === "builtin") { if (doc.editable) { this.updateMarkdown(doc); if (!this.previewFile() || doc.preview === false) doc.code.focus(); } else doc.message = "Built-in editing is unavailable for this file."; cx.notify(); return; }
     if (doc.dirty) { doc.message = "Save your draft before opening a terminal editor."; cx.notify(); return; }
     const path = doc.path, on = this.on, space = context.space, cwd = this.root;
     const customCommand = shared("blackx.editor.command") ?? "";
@@ -275,34 +278,262 @@ export default class Files extends View {
     return Boolean(this.document && /\.(md|markdown|mdown|mkd)$/i.test(this.file ?? ''));
   }
 
+  previewFile() {
+    return Boolean(this.document && /\.(md|markdown|mdown|mkd|csv|tsv)$/i.test(this.file ?? ''));
+  }
+
   updateMarkdown(doc, refreshText = true) {
     if (!doc.markdownContent) return;
     if (refreshText) { doc.markdownText = doc.code.value(); doc.markdownDirty = false; }
-    doc.markdownContent.set_props({code:doc.code, text:doc.markdownText, preview:Boolean(doc.preview)});
+    doc.markdownContent.set_props({code:doc.code, text:doc.markdownText, preview:doc.preview !== false});
   }
 
   ensureMarkdown(cx) {
     if (!this.markdownFile() || this.document.markdownContent) return false;
     const doc = this.document;
     doc.markdownText = doc.code.value(); doc.markdownDirty = false;
-    doc.markdownContent = cx.new(MarkdownContent, {code:doc.code, text:doc.markdownText, preview:Boolean(doc.preview)});
+    doc.markdownContent = cx.new(MarkdownContent, {code:doc.code, text:doc.markdownText, preview:doc.preview !== false});
     return true;
   }
 
   toggleMarkdown(cx) {
-    if (!this.markdownFile()) return;
-    this.ensureMarkdown(cx);
-    const doc = this.document;
-    doc.preview = !doc.preview;
+    if (!this.previewFile()) return;
+    const doc=this.document;
+    this.finishMarkdownEdit(doc);
+    if(this.markdownFile())this.ensureMarkdown(cx);
+    doc.preview = doc.preview === false;
     this.updateMarkdown(doc, Boolean(doc.preview && doc.markdownDirty));
-    // Native editor attachment requires the containing panel to relayout.
     cx.notify();
+  }
+
+  finishMarkdownEdit(doc) {
+    doc.markdownEdit?.input.release();doc.markdownEdit=null;
+  }
+
+  editMarkdownBlock(doc,block,cx) {
+    let start=block.start,end=block.end;
+    const previous=doc.markdownEdit;
+    if(previous && start>=previous.end){const delta=previous.input.value().length-(previous.end-previous.start);start+=delta;end+=delta;}
+    this.finishMarkdownEdit(doc);
+    const text=doc.code.value();
+    const input=TextareaState.new({value:text.slice(start,end),rows:Math.min(16,Math.max(3,text.slice(start,end).split('\n').length+1))});
+    const edit=doc.markdownEdit={start,end,input,before:text.slice(0,start),after:text.slice(end),blocks:markdownBlocks(text)};
+    input.on('change',(_,cx)=>{
+      if(doc.markdownEdit!==edit)return;
+      doc.code.set_value(edit.before+input.value()+edit.after);
+      doc.dirty=doc.code.value()!==doc.baseline;doc.markdownDirty=true;doc.message='';cx.notify();
+    });
+    input.focus();cx.notify();
+  }
+
+  markdownPreview(t) {
+    const doc=this.document,text=doc.code.value();
+    if(!doc.markdownModel||(!doc.markdownEdit && doc.markdownModel.text!==text))doc.markdownModel={text,blocks:markdownBlocks(text)};
+    const blocks=doc.markdownEdit?.blocks??doc.markdownModel.blocks;
+    return v_flex().id('markdown-editable-preview').flex_1().min_h(0).overflow_y_scrollbar().p(styles.spacing.v12).gap(styles.spacing.v8)
+      .children(blocks.map((block,index)=>{
+        const active=doc.markdownEdit?.start===block.start;
+        if(active)return v_flex().id('markdown-edit-'+index).flex_none().border(1).border_color(t.border).children([
+          Textarea.new(doc.markdownEdit.input).w_full().h(Math.min(360,Math.max(90,(block.text.split('\n').length+2)*22))).bg(t.background).text_color(t.foreground).p(8),
+          div().id('markdown-done').h(30).px(8).cursor_pointer().text_color(t.muted).child('Done').on_click((_,cx)=>{this.finishMarkdownEdit(doc);cx.notify();})
+        ]);
+        return v_flex().id('markdown-block-'+index).flex_none().w_full().cursor_text().hover(s=>s.bg(t.hover))
+          .tooltip('Click to edit this block').on_click((_,cx)=>this.editMarkdownBlock(doc,block,cx))
+          .child(block.text.trim()?TextView.markdown('markdown-rendered-'+index,block.text):div().text_color(t.dim).child('Click to write Markdown'));
+      }));
+  }
+
+  loadAsset(cx,page,request=this.fileRequest,context=this.context,path=`${this.root}/${this.file}`,on=this.on) {
+    this.fileLoading=true;
+    cx.spawn(async cx=>{
+      let asset;
+      const current=()=>this.fileRequest===request && this.current(context);
+      const renderPage=async (number,cached=false)=>{
+        const r=await exec('python3',[appHome()+'/mods/blackx-files/preview.py',appHome(),path,on||'',String(number),...(cached?['--cached']:[])],{timeout:120000});
+        const result=JSON.parse(r.stdout||'{}');
+        if(r.code||result.error)throw Error(result.error||r.stderr);
+        return result;
+      };
+      try {
+        const result=await renderPage(page);
+        if(!current())return;
+        asset={...result,paths:[result.path]};
+        this.asset=asset;this.fileError=null;cx.notify();
+        // Append pages in order without downloading the source again. Keep the
+        // same scroll container while later pages become available.
+        if(/\.pdf$/i.test(path))for(let number=page+1;number<=result.pages;number++) {
+          if(!current())return;
+          const next=await renderPage(number,true);
+          if(!current())return;
+          asset.paths.push(next.path);cx.notify();
+        }
+      } catch(e) {
+        if(current()){this.fileError=String(e);if(asset)asset.error=String(e);}
+      } finally {
+        if(current()){this.fileLoading=false;cx.notify();}
+      }
+    });
+  }
+
+  csvState(doc) {
+    const text=doc.code.value();
+    if(doc.csv?.text===text)return doc.csv;
+    doc.csv?.input?.release();
+    doc.csv?.pendingDelete?.focus.release();
+    const delimiter=/\.tsv$/i.test(doc.path)?'\t':',';
+    const rows=parseCSV(text.replace(/^\uFEFF/,''),delimiter);
+    return doc.csv={text,rows,delimiter,newline:text.includes('\r\n')?'\r\n':'\n',
+      bom:text.startsWith('\uFEFF')?'\uFEFF':'',trailing:/[\r\n]$/.test(text),selected:null,input:null};
+  }
+
+  commitCSV(doc,state) {
+    if(doc.csv!==state)return;
+    const text=state.bom+serializeCSV(state.rows,state.delimiter,state.newline)+(state.trailing?state.newline:'');
+    state.text=text;
+    doc.code.set_value(text);
+    doc.dirty=text!==doc.baseline;doc.message='';
+  }
+
+  selectCSV(doc,row,column,cx) {
+    const state=this.csvState(doc);
+    if(state.selected?.row===row && state.selected?.column===column){state.input?.focus();return;}
+    state.input?.release();state.selected={row,column};
+    const input=state.input=TextareaState.new({value:state.rows[row]?.[column]??'',rows:2});
+    input.on('change',(_,cx)=>{
+      if(doc.csv!==state||state.input!==input||!state.rows[row])return;
+      while(state.rows[row].length<=column)state.rows[row].push('');
+      state.rows[row][column]=input.value();this.commitCSV(doc,state);cx.notify();
+    });
+    input.focus();cx.notify();
+  }
+
+  requestCSVDelete(doc,kind,index,label,cx) {
+    const state=this.csvState(doc);
+    state.pendingDelete?.focus.release();
+    const focus=cx.focus_handle();
+    state.pendingDelete={kind,index,label,expected:doc.code.value(),focus};
+    focus.focus();cx.notify();
+  }
+
+  cancelCSVDelete(state,cx) {
+    state.pendingDelete?.focus.release();state.pendingDelete=null;
+    state.input?.focus();cx.notify();
+  }
+
+  csvDeleteConfirmation(doc,state,t) {
+    const pending=state.pendingDelete;
+    const confirm=cx=>{
+      pending.focus.release();state.pendingDelete=null;
+      this.confirmCSVDelete(doc,state,pending.kind,pending.index,pending.expected,cx);
+    };
+    const action=(id,text,callback)=>div().id(id).h(32).px(12).flex().items_center().cursor_pointer()
+      .text_color(t.foreground).hover(s=>s.bg(t.hover)).child(text).on_click(callback);
+    return div().id('csv-delete-backdrop').absolute().inset_0().bg('#000000aa').flex().items_center().justify_center()
+      .on_mouse_down('left',(_,cx)=>cx.stop_propagation()).track_focus(pending.focus)
+      .on_key_down((event,cx)=>{
+        if(event.key==='escape')this.cancelCSVDelete(state,cx);
+        else if(event.key==='enter')confirm(cx);
+        else return;
+        cx.stop_propagation();
+      })
+      .child(v_flex().id('csv-delete-dialog').w(420).max_w_full().p(18).gap(12).bg(t.background).border(1).border_color(t.border)
+        .child(div().font_semibold().text_color(t.foreground).child(`Delete ${pending.kind} ${pending.label}?`))
+        .child(div().text_color(t.muted).child(`${pending.kind==='column'?'This removes the column from every row.':'This removes the entire row.'} Changes stay in your draft until Save.`))
+        .child(h_flex().justify_end().children([
+          action('csv-delete-cancel','Cancel',(_,cx)=>this.cancelCSVDelete(state,cx)),
+          action('csv-delete-confirm','Delete',(_,cx)=>confirm(cx))
+        ])));
+  }
+
+  confirmCSVDelete(doc,state,kind,index,expected,cx) {
+    if(doc.csv!==state||doc.code.value()!==expected){
+      doc.message='CSV changed while confirmation was open. Choose the row or column again.';cx.notify();return;
+    }
+    const columns=state.rows.reduce((max,row)=>Math.max(max,row.length),1);
+    if(!Number.isInteger(index)||index<0||!['row','column'].includes(kind)||index>=(kind==='row'?state.rows.length:columns))return;
+    state.input?.release();state.input=null;state.selected=null;
+    if(kind==='row'){
+      state.rows.splice(index,1);
+      if(!state.rows.length)state.rows.push(['']);
+    }else state.rows.forEach(row=>{if(index<row.length)row.splice(index,1);if(!row.length)row.push('');});
+    this.commitCSV(doc,state);cx.notify();
+  }
+
+  csvContent(t) {
+    const doc=this.document;
+    const button=(id,text,action,enabled=true)=>div().id(id).px(8).h(30).flex_none().flex().items_center()
+      .text_color(enabled?t.foreground:t.dim).when(enabled,el=>el.cursor_pointer().hover(s=>s.bg(t.hover))
+        .on_click((_,cx)=>{action(cx);cx.notify();})).child(text);
+    let state;
+    try {state=this.csvState(doc);}catch(error){return v_flex().flex_1().min_h(0).children([div().p(12).text_color(t.dim).child(String(error)+' · use the header preview icon to open Source and repair the CSV')]);}
+    const {rows,selected}=state;
+    const pageSize=100,pageCount=Math.max(1,Math.ceil(rows.length/pageSize));
+    state.page=Math.min(state.page??0,pageCount-1);
+    const start=state.page*pageSize,end=Math.min(rows.length,start+pageSize);
+    const columns=rows.reduce((max,row)=>Math.max(max,row.length),1),cellWidth=180,indexWidth=72,width=indexWidth+columns*cellWidth;
+    const clearSelection=()=>{state.input?.release();state.input=null;state.selected=null;};
+    const columnName=index=>{let label='';for(let n=index+1;n>0;n=Math.floor((n-1)/26))label=String.fromCharCode(65+(n-1)%26)+label;return label;};
+    const cell=(id,w)=>div().id(id).w(w).flex_none().h_full().min_w(0).border_r(1).border_color(t.border).flex().items_center();
+    const deleteIcon=(kind,index,label)=>div().id(`csv-delete-${kind}-${index}`).w(24).h(24).flex_none().flex().items_center().justify_center()
+      .cursor_pointer().text_color(t.dim).hover(s=>s.bg(t.hover).text_color(t.foreground)).tooltip(`Delete ${kind} ${label}`)
+      .child(svg('trash-2').size(styles.components.files.glyph14).flex_none())
+      .on_click((_,cx)=>{cx.stop_propagation();this.requestCSVDelete(doc,kind,index,label,cx);});
+    const addIcon=(id,label,action)=>div().id(id).flex_none().flex().items_center().justify_center()
+      .cursor_pointer().text_color(t.dim).hover(s=>s.bg(t.hover).text_color(t.foreground)).tooltip(label)
+      .child(svg('plus').size(styles.components.files.glyph14).flex_none())
+      .on_click((_,cx)=>{cx.stop_propagation();action(cx);cx.notify();});
+    const addRow=()=>{clearSelection();rows.push(Array(columns).fill(''));state.page=Math.floor((rows.length-1)/pageSize);this.commitCSV(doc,state);};
+    const addColumn=()=>{clearSelection();rows.forEach(row=>{while(row.length<columns)row.push('');row.push('');});this.commitCSV(doc,state);};
+    const renderRow=row=>h_flex().id('csv-row-'+row).w(width).h(selected?.row===row?80:32).flex_none().border_b(1).border_color(t.border)
+      .bg(row===0?t.chrome:t.background).children([
+        cell('csv-index-'+row,indexWidth).pl(8).pr(4).text_color(t.dim)
+          .child(div().flex_1().min_w(0).child(String(row+1))).child(deleteIcon('row',row,String(row+1))),
+        ...Array.from({length:columns},(_,column)=>{
+          const active=selected?.row===row&&selected?.column===column;
+          return cell(`csv-cell-${row}-${column}`,cellWidth).when(column===columns-1,el=>el.border_r(0)).when(active,el=>el.bg(t.selected))
+            .when(!active,el=>el.cursor_pointer().hover(s=>s.bg(t.hover)).on_click((_,cx)=>this.selectCSV(doc,row,column,cx)))
+            .child(active?Textarea.new(state.input).w_full().h(76).text_color(t.foreground).bg(t.selected).px(8):
+              div().px(8).min_w(0).truncate().text_color(t.foreground).when(row===0,el=>el.font_semibold())
+                .tooltip(rows[row]?.[column]??'').child((rows[row]?.[column]??'').replace(/\r?\n/g,' ↵ ')));
+        })
+      ]);
+    return v_flex().id('csv-table-view').relative().flex_1().min_h(0).min_w(0).children([
+      ...(pageCount>1?[h_flex().flex_none().h(32).items_center().border_b(1).border_color(t.border).children([
+        button('csv-previous','Previous',()=>{clearSelection();state.page--;},state.page>0),
+        button('csv-next','Next',()=>{clearSelection();state.page++;},state.page<pageCount-1)
+      ])]:[]),
+      h_flex().id('csv-horizontal-scroll').flex_1().min_h(0).min_w(0).items_stretch().overflow_x_scrollbar().child(
+        v_flex().id('csv-table-scroll').w(width+32).flex_none().min_h(0).self_stretch().overflow_y_scrollbar().child(
+          h_flex().w_full().flex_none().items_stretch().children([
+          v_flex().w(width).flex_none().children([
+            h_flex().h(30).flex_none().bg(t.chrome).border_b(1).border_color(t.border).children([
+              cell('csv-header-index',indexWidth).px(8).text_color(t.dim).child('#'),
+              ...Array.from({length:columns},(_,column)=>cell('csv-header-'+column,cellWidth).when(column===columns-1,el=>el.border_r(0)).pl(8).pr(4).text_color(t.muted).font_semibold()
+                .child(div().flex_1().min_w(0).child(columnName(column))).child(deleteIcon('column',column,columnName(column))))
+            ]),
+            v_flex().id('csv-rows').flex_none().w_full()
+              .children(Array.from({length:end-start},(_,index)=>renderRow(start+index)))
+              .child(h_flex().id('csv-add-row-footer').w(width).h(32).flex_none().border_b(1).border_color(t.border)
+                .child(addIcon('csv-add-row','Add row',addRow).w_full().h_full().bg(t.chrome)))
+          ]),
+          addIcon('csv-add-column','Add column',addColumn).w(32).self_stretch().bg(t.chrome).border_l(1).border_r(1).border_b(1).border_color(t.border).rounded(0)
+          ])
+        )
+      ),
+      div().id('csv-status').h(30).flex_none().flex().items_center().px(8).text_size(styles.components.files.captionText).text_color(t.dim)
+        .child(`${rows.length} rows · ${columns} columns`)
+    ]).when(Boolean(state.pendingDelete),el=>el.child(this.csvDeleteConfirmation(doc,state,t)));
   }
 
   fileContent(t) {
     if (!this.file) return div().p(styles.spacing.v12).text_color(t.dim).child('Select a file to edit');
+    if(this.asset) return v_flex().id('file-asset-content').flex_1().min_h(0).overflow_y_scrollbar().gap(styles.spacing.v8)
+      .children(this.asset.paths.map((path,index)=>image(path).id('asset-page-'+index).w_full().flex_none()))
+      .when(Boolean(this.fileLoading && /\.pdf$/i.test(this.file)),el=>el.child(div().p(8).text_color(t.dim).child(`Loading pages · ${this.asset.paths.length} / ${this.asset.pages}`)))
+      .when(Boolean(this.asset.error),el=>el.child(div().p(8).text_color(t.dim).child(this.asset.error)));
     if (!this.code) return div().p(styles.spacing.v12).text_color(t.dim).child(this.fileError || 'Loading file…');
-    if (this.markdownFile() && this.document.preview && this.document.markdownContent) return this.document.markdownContent;
+    if (/\.(csv|tsv)$/i.test(this.file) && this.document?.editable && this.document.preview !== false) return this.csvContent(t);
+    if (this.markdownFile() && this.document.preview !== false) return this.document.editable ? this.markdownPreview(t) : this.document.markdownContent;
     return Editor.new(this.code).w_full().min_w(0).flex_1().min_h(0);
   }
 
@@ -421,6 +652,8 @@ export default class Files extends View {
       .when(!systemMode, el => el.child(v_flex().id("files-contents").flex_1().min_w(0).min_h(0).overflow_hidden()
         .child(h_flex().h(styles.components.files.headerHeight).flex_none().pl(styles.spacing.v14).pr(styles.spacing.v0).items_center().border_b(styles.border.v1).border_color(t.border)
           .child(div().flex_1().min_w(0).truncate().text_color(t.foreground).child((this.file ?? "Content") + (this.document?.dirty ? " *" : "")))
+          .when(Boolean(this.asset && /\.pdf$/i.test(this.file ?? '')), el => el.child(div().id('pdf-page-count').flex_none().px(styles.spacing.v8).text_color(t.muted)
+            .child(`${this.asset?.pages} ${this.asset?.pages === 1 ? 'page' : 'pages'}`)))
           .when(Boolean(this.code), el => el.child(div().id("file-wrap").h_full().w(styles.components.files.actionWidth).flex_none().flex().items_center().justify_center().cursor_pointer()
             .bg(this.wrapLines ? t.selected : t.background).text_color(t.foreground).hover(s => s.bg(t.hover))
             .tooltip(this.wrapLines ? "Disable line wrapping" : "Wrap text lines")
@@ -435,10 +668,10 @@ export default class Files extends View {
               }
               cx.notify(); })
             .child(svg("wrap-text").size(styles.components.files.glyph14).flex_none())))
-          .when(this.markdownFile(), el => el.child(div().id("file-preview").h_full().w(styles.components.files.actionWidth).flex_none().flex().items_center().justify_center().cursor_pointer()
-            .text_color(t.foreground).hover(s => s.bg(t.hover)).tooltip(this.document?.preview ? "Hide Markdown preview" : "Show Markdown preview")
+          .when(this.previewFile(), el => el.child(div().id("file-preview").h_full().w(styles.components.files.actionWidth).flex_none().flex().items_center().justify_center().cursor_pointer()
+            .text_color(t.foreground).hover(s => s.bg(t.hover)).tooltip(this.document?.preview !== false ? "Show source" : "Show editable preview")
             .on_click((_event, cx) => this.toggleMarkdown(cx))
-            .child(eyeIcon(!this.document?.preview))))
+            .child(eyeIcon(this.document?.preview === false))))
           .when(Boolean(this.document?.editable && this.document?.dirty), el => el.child(div().id("file-save").h_full().px(styles.spacing.v8).flex_none().flex().items_center().rounded(styles.radius.v0).text_size(styles.components.files.controlText).bg(t.chrome).cursor_pointer()
             .text_color(t.foreground).hover(s => s.bg(t.hover))
             .on_click((_event, cx) => this.save(cx)).child(this.document.saving ? "Saving…" : "Save"))))

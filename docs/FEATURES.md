@@ -8,7 +8,7 @@ This inventory describes the maintained source. Optional integrations and machin
 
 Open **Settings → blackx** for the package’s directory and editor controls. These choices let you keep the workspace’s project folder steady, follow the terminal as its directory changes, or browse a custom absolute path. Files and Changes share the choice.
 
-Choose the built-in source editor, System default (`$EDITOR`), or a custom executable with quoted arguments. External commands run on the file’s machine, receive the file path automatically, and open in a new Herdr tab. Both external modes show a full-width file tree; returning to Built-in restores the content split and its saved tree width. Drafts must be saved before launching an external editor. These controls do not require hand-editing a configuration file.
+Choose the built-in viewer/editor, System default (`$EDITOR`), or a custom executable with quoted arguments. External commands run on the file’s machine, receive the file path automatically, and open in a new Herdr tab. Both external modes show a full-width file tree; returning to Built-in restores the content split and its saved tree width. Drafts must be saved before launching an external editor. These controls do not require hand-editing a configuration file.
 
 ![blackx directory-source and editor configuration](screenshots/configs.png)
 
@@ -83,23 +83,60 @@ Directory colors propagate through every parent, including collapsed folders. Fo
 
 “Existing” means present in Git’s last commit. Git does not track empty directories, so a previously empty folder receiving its first untracked file is treated as new. Before the first commit, added directories are green. Colors use the active theme’s ANSI palette; blackx-mono renders these roles in grayscale. Selection and hover backgrounds remain unchanged.
 
-## Editing
+## File previews and editing
 
-Three editor modes are available under Settings → blackx:
+Set **Settings → blackx → Editor → Built-in** for native previews. System default (`$EDITOR`) and Custom still launch a terminal editor on the file's machine and show a full-width file tree.
 
-| Mode | Behavior |
-| --- | --- |
-| Built-in | Opens editable source inside Files, including Markdown source. |
-| System default | Uses `$EDITOR` on the file’s machine and opens a terminal editor in a new Herdr tab. |
-| Custom | Uses a configured editor command and appends the file path automatically. |
+| File type | Built-in view | Editing |
+| --- | --- | --- |
+| Markdown (`.md`, `.markdown`, `.mdown`, `.mkd`) | Rendered preview by default; eye icon switches to source | Click a block, edit its Markdown inline, then choose Done |
+| CSV / TSV | Table preview by default; the same eye icon switches to source | Click a cell to edit, including multiline values |
+| PNG, JPEG, WebP, GIF, SVG | Standalone image preview, fitted to the content width | Read only; decoding depends on Herdr's image loader |
+| PDF | All pages in one vertical scroll; total page count at the header's right | Read only |
+| HTML, CSS, JavaScript and other text | Source editor | Text editing; no live HTML/CSS/JavaScript preview |
 
-- Built-in Save button and `Cmd-S` binding, line wrapping, and a Markdown preview toggle.
-- Retained unsaved drafts and conflict checks when files change on disk.
-- Draft preservation after save failures.
-- Local and remote text saves, including atomic remote replacement through private transient requests and streamed input.
-- Dirty built-in drafts must be saved before launching a terminal editor.
-- Passive refreshes and restored selections do not launch external editor tabs.
-- Binary, oversized, and unreadable files are subject to editor limits; this is not an unrestricted binary editor.
+### Shared source/preview control
+
+Markdown and CSV/TSV open in preview by default. The eye icon in the content header switches to source and back. Both views edit the same draft. Save/Cmd-S performs the existing conflict-safe local/remote write; view switches and structural table edits do not save automatically. Failed saves keep edits. Oversized text remains read-only.
+
+For Markdown, click a rendered block, edit its Markdown text inline, then choose Done to render it again. Other blocks remain visible. Fenced code and blank separators are preserved around edited blocks. This is block editing, without a rich-text formatting toolbar or automatic inline-media loading.
+
+### CSV / TSV tables
+
+Tables show column letters, row numbers, aligned cell borders, and horizontal scrolling. Click a cell for inline multiline editing. The first record stays editable, and row totals include it. Tables use pages of **100 rows**, with Previous/Next above the table when needed.
+
+- The centered **+ strip below the rows** fills the table width and appends an empty row, opening its last page.
+- The centered **+ strip on the right** matches the actual table height, excluding empty space below, and appends an empty column.
+- Every row and column header has a trash icon. Confirm to remove that target from the draft; Cancel/Escape changes nothing. A changed draft invalidates an old confirmation. Removing the final row/column leaves an editable empty placeholder.
+- The bottom status row contains only **N rows · M columns**.
+
+Values stay strings, including leading zeros, Unicode and empty cells. Quoted delimiters, escaped quotes, multiline cells, UTF-8 BOM and LF/CRLF conventions are supported. Serialization can normalize quoting, without converting values to numbers, dates or formulas. Invalid CSV has a source-repair path. Sorting, filtering and spreadsheet formulas are not implemented.
+
+![Editable CSV table and its add/delete controls](screenshots/files.csv.png)
+
+### Images
+
+Standalone PNG, JPEG, WebP, GIF and SVG files use Herdr's image loader. They are read-only, fit the content width and scroll vertically. The filename remains in the header; no PDF controls or read-only captions appear inside image content. There are no image-editing, animation or zoom controls.
+
+![Image inside the Files panel](screenshots/files.image.png)
+
+### PDFs
+
+All pages load progressively in order in one vertical scroll, including mixed portrait/landscape pages. The total page count stays at the header's right. Poppler renders page images locally and reuses the staged source for subsequent pages. A failure on a later page keeps earlier pages visible with an error message.
+
+PDF previews are read-only page images, without text selection/search, password entry, editing, zoom, or Previous/Next page controls. Protected, corrupt or unreadable files can fail to render.
+
+![Continuous PDF preview and page count](screenshots/files.pdf.png)
+
+### Limits, cache and remote access
+
+- Text editing: **400,000 characters**. Larger text is truncated/read-only and cannot be saved from its truncated preview.
+- Image/PDF source size: **50 MiB**, with additional `hc` transport limits for remote previews. Rendering has subprocess timeouts and pages are scaled to at most 1,600 pixels along their longest dimension.
+- Local/remote image and PDF sources are copied into `blackx-preview-cache/` under the selected Herdr home. This cache is separate from the file clipboard and portable package. Folders older than 24 hours are pruned when the helper runs.
+- Reopen an image/PDF to refresh external changes. Text refreshes preserve dirty drafts and report conflicts.
+- Poppler is local even for remote PDFs; Python 3 and the existing Herdr connection are needed at the remote endpoint. Linux file-transfer tests do not establish complete remote-preview or Windows coverage.
+
+HTML/CSS/JavaScript are source-editable; **live HTML preview, inline Markdown media and audio/video playback remain unimplemented**. The HTML fixture demonstrates desired browser behavior and does not enable a browser inside Herdr.
 
 ## File and folder operations
 
@@ -138,7 +175,7 @@ The shared file clipboard remembers the source path, machine, and whether Copy o
 - Applies stricter source-change checks to Move, including retaining sources with uncopied runtime entries.
 - Allows up to ten minutes for large cross-machine operations.
 
-Machines must already be connected through Herdr, with Python 3 on participating endpoints. Linux Trash requires `gio`; Reveal is local-only. Dependencies are not automatically installed. Linux remote endpoints have dedicated integration tests; this does not establish full Windows support.
+Machines must already be connected through Herdr, with Python 3 on participating endpoints. Linux Trash requires `gio`; Reveal is local-only. Installation provisions missing runtime tools through `install-dependencies.sh`; see the package README for the dependency list. Linux remote endpoints have dedicated integration tests; this does not establish full Windows support.
 
 ## Git Changes panel
 
@@ -218,6 +255,6 @@ Before publishing, run local native Herdr checks and exercise changed views. Rea
 
 Tested with Herdr 0.1.13 and 0.1.14 on macOS. Linux remote endpoints have dedicated integration tests; Windows and broader remote behavior remain incompletely validated. Personal copies of Herdr interfaces require review after Herdr upgrades.
 
-The current source includes Custom editor commands, directory-source selection, Markdown preview, and Claude bridge-file usage reporting.
+The current source includes editable Markdown/CSV previews, standalone image viewing, continuous read-only PDF pages, automatic local dependency setup, Custom editor commands, directory-source selection, and Claude bridge-file usage reporting.
 
 For installation and development, see [maintainer guide](DEVELOPMENT.md). For package behavior and dependencies, see [RECIPE.md](../src/RECIPE.md).

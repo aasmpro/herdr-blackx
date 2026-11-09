@@ -6,6 +6,7 @@ import json
 from pathlib import Path
 import os
 import shutil
+import subprocess
 import tempfile
 from build import ROOT, build
 
@@ -20,6 +21,8 @@ files = [p for directory in ('mods', 'layouts', 'themes') for p in (bundle / dir
 collisions = [p for p in files if (args.home / p.relative_to(bundle)).exists()]
 if collisions and not args.update:
     parser.error('Names already exist: ' + ', '.join(str(p.relative_to(bundle)) for p in collisions) + '. Review them before using --update.')
+# Check collisions before installing system packages or writing bundle files.
+subprocess.run(['sh', str(bundle / 'install-dependencies.sh')], check=True)
 settings_path = args.home / 'settings.json'
 settings_update = None
 if args.sync_style_settings:

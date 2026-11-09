@@ -1,4 +1,5 @@
 import json
+import os
 from pathlib import Path
 import shutil
 import subprocess
@@ -97,19 +98,24 @@ class BundleTests(unittest.TestCase):
             resolve({'$ref': 'a'}, {'a': {'$ref': 'a'}})
 
     def test_installer_preserves_personal_state_and_refuses_collisions(self):
-        with tempfile.TemporaryDirectory() as directory:
+        with tempfile.TemporaryDirectory() as directory, tempfile.TemporaryDirectory() as tools:
             home = Path(directory)
             personal = {'font': 'Personal Font', 'zoom': 1.6, 'sounds': {'enabled': False}, 'colors': {'customRole': '#123456'}}
             (home / 'settings.json').write_text(json.dumps(personal))
             (home / 'keys.json').write_text('{"global":{"cmd-t":"custom"}}')
             (home / 'shared.json').write_text('{"sidebar.width":301}')
             original = {p.name:p.read_bytes() for p in home.iterdir()}
+            # Stub only the dependency shell so installer tests cannot install system packages.
+            shell = Path(tools) / 'sh'
+            shell.write_text('#!/bin/sh\ncase "$1" in */install-dependencies.sh) exit 0 ;; *) exit 99 ;; esac\n')
+            shell.chmod(0o755)
+            env = {**os.environ, 'PATH': tools + os.pathsep + os.environ.get('PATH', '')}
             cmd = [sys.executable, str(ROOT / 'tools/install.py'), '--home', str(home)]
-            subprocess.run(cmd, check=True, capture_output=True)
+            subprocess.run(cmd, check=True, capture_output=True, env=env)
             for name, content in original.items():
                 self.assertEqual((home / name).read_bytes(), content)
-            self.assertNotEqual(subprocess.run(cmd, capture_output=True).returncode, 0)
-            subprocess.run(cmd + ['--update', '--sync-style-settings'], check=True, capture_output=True)
+            self.assertNotEqual(subprocess.run(cmd, capture_output=True, env=env).returncode, 0)
+            subprocess.run(cmd + ['--update', '--sync-style-settings'], check=True, capture_output=True, env=env)
             merged = json.loads((home / 'settings.json').read_text())
             self.assertEqual(merged['zoom'], 1.1)
             self.assertFalse(merged['font_ligatures'])
@@ -119,6 +125,12 @@ class BundleTests(unittest.TestCase):
             self.assertEqual((home / 'keys.json').read_bytes(), original['keys.json'])
             self.assertEqual((home / 'shared.json').read_bytes(), original['shared.json'])
             self.assertTrue(list((home / 'backups').glob('*/settings.json')))
+            shell.write_text('#!/bin/sh\nexit 7\n')
+            before = (home / 'layouts/blackx.json').read_bytes()
+            result = subprocess.run(cmd + ['--update'], capture_output=True, env=env)
+            self.assertNotEqual(result.returncode, 0)
+            self.assertEqual((home / 'layouts/blackx.json').read_bytes(), before)
+
 
 if __name__ == '__main__':
     unittest.main()

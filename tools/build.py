@@ -34,7 +34,7 @@ def json_bytes(value):
 def outputs(root=ROOT):
     src = root / 'src'
     tokens = resolve(read_json(src / 'styles.json'), read_json(src / 'styles.json'))
-    files = {}
+    files = {'install-dependencies.sh': (src / 'install-dependencies.sh').read_bytes()}
     for name in MODS:
         for path in sorted((src / 'mods' / name).rglob('*')):
             if path.is_file() and '__pycache__' not in path.parts and path.suffix != '.pyc':
@@ -54,7 +54,7 @@ def outputs(root=ROOT):
         files[f'mods/{name}/style.js'] = (src / 'shared/style.js').read_text().replace('__STYLE_TOKENS__', json.dumps(tokens, indent=2)).encode()
     for source, target in [('layout.json', 'layouts/blackx.json'), ('theme.json', 'themes/blackx.json'), ('theme-mono.json', 'themes/blackx-mono.json')]:
         files[target] = json_bytes(resolve(read_json(src / source), tokens))
-    for source, target in [('src/README.md', 'README.md'), ('src/RECIPE.md', 'RECIPE.md'), ('docs/screenshots/preview.png', 'preview.png'), ('docs/screenshots/configs.png', 'screenshots/configs.png'), ('docs/screenshots/machine.png', 'screenshots/machine.png'), ('docs/screenshots/files.png', 'screenshots/files.png')]:
+    for source, target in [('src/README.md', 'README.md'), ('src/RECIPE.md', 'RECIPE.md'), ('docs/screenshots/preview.png', 'preview.png'), ('docs/screenshots/configs.png', 'screenshots/configs.png'), ('docs/screenshots/machine.png', 'screenshots/machine.png'), ('docs/screenshots/files.png', 'screenshots/files.png'), ('docs/screenshots/files.csv.png', 'screenshots/files.csv.png'), ('docs/screenshots/files.image.png', 'screenshots/files.image.png'), ('docs/screenshots/files.pdf.png', 'screenshots/files.pdf.png')]:
         if (root / source).exists():
             files[target] = (root / source).read_bytes()
             if target in ('README.md', 'RECIPE.md'):

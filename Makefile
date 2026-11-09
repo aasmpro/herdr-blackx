@@ -9,11 +9,14 @@ ARCHIVE ?= $(DIST_DIR)/blackx.tar.gz
 MACHINE_A ?= blackx-incus-a
 MACHINE_B ?= blackx-incus-b
 
-.PHONY: help build check test test-python test-js check-mods verify install update sync-style release archive test-remote status
+.PHONY: help dependencies build check test test-python test-js check-mods verify install update sync-style release archive test-remote status
 
 help: ## Show available targets and configuration
 	@awk 'BEGIN {FS = ":.*## "; print "herdr-blackx targets:"} /^[a-zA-Z_-]+:.*## / {printf "  %-16s %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 	@printf '\nOverrides: PYTHON NODE HERDR_APP HERDR_HOME DIST_DIR ARCHIVE MACHINE_A MACHINE_B\n'
+
+dependencies: ## Install missing runtime dependencies using the system package manager
+	sh src/install-dependencies.sh
 
 build: ## Generate the native release/blackx package
 	$(PYTHON) tools/build.py
@@ -37,13 +40,19 @@ verify: ## Check package freshness, all local tests, and all native mods
 	$(MAKE) test
 	$(MAKE) check-mods
 
-install: build ## Install into HERDR_HOME; refuse existing names
+install: ## Install into HERDR_HOME; refuse existing names
+	$(MAKE) dependencies
+	$(MAKE) build
 	$(PYTHON) tools/install.py --home "$(HERDR_HOME)"
 
-update: build ## Back up and update existing blackx files in HERDR_HOME
+update: ## Back up and update existing blackx files in HERDR_HOME
+	$(MAKE) dependencies
+	$(MAKE) build
 	$(PYTHON) tools/install.py --home "$(HERDR_HOME)" --update
 
-sync-style: build ## Update blackx and merge palette/font settings, with backups
+sync-style: ## Update blackx and merge palette/font settings, with backups
+	$(MAKE) dependencies
+	$(MAKE) build
 	$(PYTHON) tools/install.py --home "$(HERDR_HOME)" --update --sync-style-settings
 
 release: ## Rebuild, validate, and archive the native package; does not publish

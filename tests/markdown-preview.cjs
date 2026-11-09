@@ -8,7 +8,7 @@ const sandbox={View:class{},v_flex:()=>new Element(),styles:{spacing:{v12:12}},E
 vm.createContext(sandbox);vm.runInContext(load('markdown-content.js')+'\n'+load('main.js')+'\nglobalThis.FilesClass=Files;',sandbox);
 const files=new sandbox.FilesClass();let text='# Original draft';
 const code={value(){valueReads++;return text;},focus(){focuses++;}};
-files.file='notes.md';files.code=code;files.document={code,editable:true,dirty:true,baseline:'# Saved'};
+files.file='notes.md';files.code=code;files.document={code,editable:true,dirty:true,baseline:'# Saved',preview:false};
 assert(files.ensureMarkdown(context));assert.equal(markdownParses,1);assert.equal(editorBuilds,0);
 const initialReads=valueReads;
 for(let i=0;i<100;i++)files.toggleMarkdown(context);

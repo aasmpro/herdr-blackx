@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>blackx HTML preview sample</title>
+  <link rel="stylesheet" href="sample.css">
+  <script src="sample.js" defer></script>
+  <style>.inline-style { border-left: 3px solid #8be9bb; padding-left: 12px; }</style>
+</head>
+<body>
+  <main>
+    <header><span class="eyebrow">BLACKX / FILE FIXTURE</span><h1>HTML, CSS &amp; JavaScript</h1><p>A self-contained preview test. No network requests or external libraries.</p></header>
+    <section aria-labelledby="styles-heading">
+      <h2 id="styles-heading">CSS rendering</h2>
+      <div class="cards"><article><strong>Typography</strong><p>Headings, spacing and responsive cards.</p></article><article><strong>Color</strong><p>Gradient accents, borders and hover states.</p></article><article><strong>Layout</strong><p>Resize to switch between one and three columns.</p></article></div>
+      <p class="inline-style">This paragraph uses an inline stylesheet.</p>
+    </section>
+    <section aria-labelledby="interaction-heading">
+      <h2 id="interaction-heading">JavaScript interaction</h2>
+      <p id="script-status" role="status">JavaScript has not run.</p>
+      <div class="controls"><button id="increment" type="button">Count: 0</button><button id="reset" type="button">Reset</button><button id="theme" type="button" aria-pressed="false">Toggle light theme</button></div>
+      <form id="greeting-form"><label for="name">Your name</label><input id="name" name="name" placeholder="Type a test name" maxlength="80"><button type="submit">Greet</button></form>
+      <p id="greeting" aria-live="polite">Submit the form to update this text.</p>
+      <noscript>Enable JavaScript to test the counter, theme and form.</noscript>
+    </section>
+    <section><h2>Table and links</h2><table><thead><tr><th>Format</th><th>Test</th></tr></thead><tbody><tr><td>PDF</td><td>Multiple pages and scrolling</td></tr><tr><td>CSV</td><td>Quoted cells and editing</td></tr><tr><td>HTML</td><td>Styles and live interactions</td></tr></tbody></table><p><a href="sample.csv">CSV fixture</a> · <a href="sample.pdf">PDF fixture</a> · <a href="#styles-heading">Back to styles</a></p></section>
+    <footer>End of sample. All interactions stay on this page.</footer>
+  </main>
+</body>
+</html>

@@ -1,6 +1,6 @@
 # blackx for Herdr
 
-blackx is a compact black Herdr layout with spaces, agents, flat tabs, pane controls, Files, Changes and a usage status bar.
+blackx is a compact black Herdr layout with spaces, agents, flat tabs, pane controls, Files with editable Markdown/CSV previews and image/PDF viewing, Changes and a usage status bar.
 
 See [FEATURES.md](FEATURES.md) for the detailed feature inventory, optional setup, and limitations.
 
@@ -17,6 +17,7 @@ Read the [package README](../release/blackx/README.md) and [recipe](../release/b
 Run `make help` for the maintainer commands:
 
 ```sh
+make dependencies # Install missing runtime dependencies
 make build        # Generate release/blackx
 make test         # Run Python and JavaScript tests
 make verify       # Check freshness, tests, and native mod rendering
@@ -46,9 +47,36 @@ A maintainer may use the optional local installer:
 python3 tools/install.py
 ```
 
+Install/update targets bootstrap missing runtime dependencies before building. Direct `tools/install.py` calls also provision dependencies after collision checks. The portable package includes the same `install-dependencies.sh`; see its README for tools, package managers and endpoint setup.
+
 It refuses existing names. After reviewing collisions, `--update` backs up and replaces package files. `--sync-style-settings` additionally merges only generated palette/font values; every other preference and all shortcuts remain untouched. `--home /path/to/herdr-home` selects another installation. Build alone never writes to Herdr's home.
 
 Personal preferences and shortcuts remain separate source examples at `src/optional-settings.json` and `src/optional-keys.json`; their resolved values are included as `preferences/settings.fragment.json` and `preferences/keys.fragment.json` in the native release. Resolve their style references through the builder when inspecting them, and merge only chosen preferences/bindings. Do not replace another person's files with these examples.
+
+## File preview implementation and checks
+
+The Files mod keeps source and preview edits in one document and saves through the same conflict-safe writer. Maintain its behavior in `src/mods/blackx-files/`:
+
+| Area | Sources | Validation |
+| --- | --- | --- |
+| Format dispatch, CSV grid, preview toggle and confirmations | `main.js`, `csv.js` | `node tests/csv-table.cjs`; `node tests/csv.cjs` |
+| Markdown block editing and source offsets | `markdown-blocks.js`, `markdown-content.js`, `main.js` | `node tests/editable-preview.cjs`; `node tests/markdown-preview.cjs` |
+| Progressive image/PDF loading and staging | `preview.py`, `main.js` | `node tests/pdf-scroll.cjs`; real Poppler rendering and in-app scrolling |
+| Dependency provisioning | `src/install-dependencies.sh`, `tools/install.py` | `python3 -m unittest discover -s tests -p test_dependencies.py -v`; installer tests in `tests/test_build.py` |
+
+Herdr's deferred virtual-list renderers cannot register event handlers or create retained state. CSV therefore renders eager pages of 100 rows; cell editors and delete confirmations are created from native event contexts. Keep the right + strip at table height, rather than panel height, and the bottom + strip at full grid width. Save remains explicit after cell or structural edits.
+
+### Manual viewer samples
+
+Open `tests/fixtures/files/` in the Files panel with Built-in selected:
+
+- `sample.csv`: quoted delimiters/quotes, multiline values, Unicode, empty cells and leading zeros. Exercise inline edits, source/preview switching, add strips, deletion confirmation and Save.
+- `sample.pdf`: three pages with portrait/landscape sizes. Verify continuous scrolling, page order and header total.
+- `sample.html`, `sample.css`, `sample.js`: linked responsive styling and interactive controls for future browser-preview work; currently editable source only. A browser can exercise the counter, theme and form.
+
+These samples can be edited during manual testing. Automated release tests keep their own fixed data so sample edits do not break `make release`. Tests must not install system packages; provisioning tests use fake package managers.
+
+Image/PDF previews cache copies under the selected Herdr home; they do not use the file-transfer clipboard. Local Poppler renders remote PDFs too. The current 50 MiB source cap does not remove hc transport limits. Native checks validate initial descriptions, not full geometry, later async states or end-to-end remote previews; verify those separately in the running app.
 
 ## Release
 
@@ -56,7 +84,7 @@ Keep source and the generated `release/blackx` package in this repository. After
 
 Publish this repository publicly and add the topic `herdr-layout` for Herdr discovery. The installable folder is `release/blackx`, containing the layout, its mods, recipe, and preview together. This is one layout bundle; `herdr-mod` is not required for its supporting mods. Repository publication and topic changes are separate from local build commands.
 
-`src/RECIPE.md` explains visuals, behavior, APIs, external commands, dependencies and checks. The maintained screenshot is `docs/screenshots/preview.png`; the builder copies it to `release/blackx/preview.png`. It is an actual capture of the running Herdr UI. Private screenshots, rollback backups and migration data remain outside the package and ignored by Git.
+`src/RECIPE.md` explains visuals, behavior, APIs, external commands, dependencies and checks. The maintained screenshot is `docs/screenshots/preview.png`; the builder copies it to `release/blackx/preview.png`. It is an actual capture of the running Herdr UI. Feature captures `files.csv.png`, `files.image.png` and `files.pdf.png` live beside it and are copied to the portable package screenshots folder. Private screenshots, rollback backups and migration data remain outside the package and ignored by Git.
 
 Tested with Herdr 0.1.13 and 0.1.14 on macOS. Broader Windows/remote compatibility is not yet validated. Preserve clone provenance and review the redistribution terms of upstream code and artwork before public release; this repository does not assert a new license for them.
 
@@ -90,7 +118,7 @@ Brand exceptions: Codex, Claude, Pi and OpenCode use monochrome Lobe Icons 1.102
 
 ## Configured file editor
 
-Choose Built-in, System default, or Custom under Settings → blackx. Built-in edits source with Save/Cmd-S, line wrapping, retained drafts, and a Markdown preview toggle. System default uses `$EDITOR` on the file's machine; Custom accepts an executable and quoted arguments. Both external modes append the file path and launch a new Herdr tab; shell substitutions and control operators are rejected. Save dirty native drafts before launching an external editor. Passive refresh/restoration does not launch editor tabs.
+Choose Built-in, System default, or Custom under Settings → blackx. Built-in defaults Markdown/CSV to editable previews, supports source editing and image/PDF viewing, and keeps Save/Cmd-S, line wrapping and drafts; see [FEATURES.md](FEATURES.md#file-previews-and-editing). System default uses `$EDITOR` on the file's machine; Custom accepts an executable and quoted arguments. Both external modes append the file path and launch a new Herdr tab; shell substitutions and control operators are rejected. Save dirty native drafts before launching an external editor. Passive refresh/restoration does not launch editor tabs.
 
 Directory source can use the workspace path, follow the terminal, or use a custom absolute path on the workspace's machine. This applies to Files and Changes.
 
@@ -98,7 +126,7 @@ In either external editor mode, Files shows only the full-width tree; the conten
 
 Directory-tree icons use Nerd Fonts 3.5.1 glyphs from the bundled JetBrainsMono Nerd Font, with 110 extension mappings, special config/manifest filenames, open/closed folders, and a generic fallback. Labels and glyphs retain muted monochrome styling. Other controls continue using Lucide and the selected brand marks.
 
-Files context menu: Copy and Move use Blackx’s shared file clipboard; Copy path uses the system text clipboard. Paste targets a folder, a file’s parent, or empty-space root. Duplicates offer Replace, Keep both, or Cancel. Delete confirms and uses system Trash, never permanent deletion. Reveal is local-only. File operations require python3 on participating machines; Linux Trash requires gio. Cross-machine transfers stream via existing hc connections, verify content hashes, and retain the source on transfer failure. Failed transfers report their staging folder for recovery. Windows requires python3 on PATH. No dependencies are installed automatically.
+Files context menu: Copy and Move use Blackx’s shared file clipboard; Copy path uses the system text clipboard. Paste targets a folder, a file’s parent, or empty-space root. Duplicates offer Replace, Keep both, or Cancel. Delete confirms and uses system Trash, never permanent deletion. Reveal is local-only. File operations require python3 on participating machines; Linux Trash requires gio. Cross-machine transfers stream via existing hc connections, verify content hashes, and retain the source on transfer failure. Failed transfers report their staging folder for recovery. Windows requires python3 on PATH. Local install/update targets provision missing runtime tools; run the dependency script with `--endpoint` on participating remote machines.
 
 Files menu starts with Add file, Add folder, and Rename. Creation targets the clicked folder, a clicked file’s parent, or the root on empty-space clicks. Prompts accept one item name, support Enter/Cancel, and retain input on errors. Existing items are never overwritten by these actions. Rename follows the selected file, expanded folders, and retained drafts. Empty-space menus disable Rename.
 

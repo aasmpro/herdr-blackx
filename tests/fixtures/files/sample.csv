@@ -1,0 +1,11 @@
+id,name,category,quantity,price,notes
+001,Notebook,Office,12,4.50,Plain text
+002,"Cable, USB-C",Electronics,5,9.99,Comma inside a quoted cell
+003,"27"" Monitor",Electronics,2,249.00,"Escaped ""double quotes"""
+004,Desk lamp,Office,3,29.50,"First line
+Second line of the same cell"
+005,Café mug,Kitchen,8,12.00,Unicode: café and 日本語
+006,Empty value,Test,,0.00,
+007,Leading zeros,Test,0005,001.20,Keep values as strings
+008,Long description,Test,1,1.00,A longer value for checking column widths and horizontal overflow in the native table editor.
+009,Name,,,No,Yes
