@@ -4,6 +4,14 @@ blackx is a native Herdr interface package with 21 namespaced mods, two palettes
 
 This inventory describes the maintained source. Optional integrations and machine-specific prerequisites are called out separately.
 
+## Configure blackx for your workflow
+
+Open **Settings → blackx** for the package’s directory and editor controls. These choices let you keep the workspace’s project folder steady, follow the terminal as its directory changes, or browse a custom absolute path. Files and Changes share the choice.
+
+Choose the built-in source editor, System default (`$EDITOR`), or a custom executable with quoted arguments. External commands run on the file’s machine, receive the file path automatically, and open in a new Herdr tab. Both external modes show a full-width file tree; returning to Built-in restores the content split and its saved tree width. Drafts must be saved before launching an external editor. These controls do not require hand-editing a configuration file.
+
+![blackx directory-source and editor configuration](screenshots/configs.png)
+
 ## Appearance and layout
 
 - Black backgrounds, gray surfaces, white accents, thin borders, and mostly square controls.
@@ -52,9 +60,28 @@ Files and Changes share a directory-source setting:
 - Expandable local and connected-machine directory trees.
 - Retained expanded folders and selected files when switching directory contexts.
 - File refresh behavior and dimmed Git-ignored entries.
+- Git status is expressed through file and directory colors, with no letter badges.
 - Nerd Font file icons with 110 extension mappings, special filenames, folder states, and a fallback glyph.
 - Resizable tree/content split for built-in editing.
 - Full-width tree when an external editor is selected.
+
+### Git colors in the file tree
+
+Git status appears through filename and icon colors, without A/M/D/U letter badges. File sizes and directory counts keep their neutral styling.
+
+| Item | Color |
+| --- | --- |
+| Modified file | Yellow |
+| Added or untracked file | Green |
+| Existing directory containing changed or added descendants | Yellow |
+| New directory containing added/untracked files | Green |
+| File with a deletion or conflict status | Red |
+| Unchanged file or directory | Normal foreground |
+| Git-ignored entry | Dimmed |
+
+Directory colors propagate through every parent, including collapsed folders. For example, adding `src/new-folder/file.txt` makes an existing `src` yellow, while the new `new-folder` and `file.txt` are green. A modification to an existing nested file makes its existing ancestor directories yellow. Once changes are committed or reverted and the tree refreshes, clean entries return to their normal color.
+
+“Existing” means present in Git’s last commit. Git does not track empty directories, so a previously empty folder receiving its first untracked file is treated as new. Before the first commit, added directories are green. Colors use the active theme’s ANSI palette; blackx-mono renders these roles in grayscale. Selection and hover backgrounds remain unchanged.
 
 ## Editing
 
@@ -78,6 +105,8 @@ Three editor modes are available under Settings → blackx:
 
 The context menu offers Add file, Add folder, Rename, Copy, Move, Paste, Copy path, local Reveal, and Delete through system Trash.
 
+![The Files context menu with file creation, clipboard, and Trash actions](screenshots/files.png)
+
 - Creation targets the clicked folder, a file’s parent, or the tree root.
 - Creation and rename refuse to overwrite existing entries; prompts retain input after errors.
 - Rename follows selected files, expanded folders, and retained drafts.
@@ -89,15 +118,27 @@ The context menu offers Add file, Add folder, Rename, Copy, Move, Paste, Copy pa
 
 ## Transfers between machines
 
-- Local/remote and remote/remote transfers through existing `hc` connections.
-- Private snapshots, chunked transfer, and destination checksum verification.
-- Symlink preservation; cross-machine folder transfers expand hard links into ordinary files.
-- Warnings for skipped sockets, pipes, devices, and entries disappearing during Copy.
-- Sources retained on transfer failure, with staging paths reported for recovery.
-- Stricter source-change checks for Move, including retaining sources with uncopied runtime entries.
-- Up to ten minutes for large cross-machine operations.
+Copy a server file to your laptop using the same menu as a local copy:
 
-Python 3 is required on participating machines. Linux Trash requires `gio`. Reveal is local-only. Dependencies are not automatically installed.
+1. Select a connected server workspace and open its Files panel.
+2. Right-click the source file or folder and choose **Copy**.
+3. Switch to a local workspace and navigate to the destination.
+4. Right-click the destination folder (or empty tree space for its root) and choose **Paste**.
+5. If the destination already exists, choose Replace, Keep both, or Cancel.
+
+The shared file clipboard remembers the source path, machine, and whether Copy or Move was selected across workspace switches. **Copy path** instead writes a path string to the system clipboard; pasting that text is not a file transfer. Copy retains the original. Move removes it only after the operation’s verification and source checks succeed.
+
+![Connected server workspace and remote Files browser](screenshots/machine.png)
+
+- Supports server-to-local, local-to-server, server-to-server, and same-machine operations through existing `hc` connections.
+- Transfers folders as well as files, using private snapshots, 2 MiB chunks, and destination checksum verification.
+- Preserves symlinks; cross-machine folder transfers expand hard links into ordinary files.
+- Warns about skipped sockets, pipes, devices, and entries disappearing during Copy.
+- Retains sources on transfer failure and reports recovery staging paths when applicable.
+- Applies stricter source-change checks to Move, including retaining sources with uncopied runtime entries.
+- Allows up to ten minutes for large cross-machine operations.
+
+Machines must already be connected through Herdr, with Python 3 on participating endpoints. Linux Trash requires `gio`; Reveal is local-only. Dependencies are not automatically installed. Linux remote endpoints have dedicated integration tests; this does not establish full Windows support.
 
 ## Git Changes panel
 
@@ -112,13 +153,23 @@ Commit runs `git add -A` followed by `git commit`: it stages all changes, not a 
 
 ## Status bar and usage
 
+The footer combines workspace context with provider usage so you can see remaining allowance while working:
+
 - Current machine, available Git branch, workspace agent count, and count needing attention.
 - Command-palette hint based on the actual shortcut binding.
-- Codex/Claude usage selection based on the focused program.
-- Remaining usage percentages and reset countdowns for available usage windows.
-- Automatic refresh, click-to-refresh, stale-data markers, and unavailable/retry states.
+- Claude usage when the focused program is Claude; Codex otherwise, with per-provider cached readings.
+- **Remaining** percentages, calculated from reported used percentages, and reset countdowns for the available primary and secondary windows.
+- Codex credit balance or an unlimited indicator when supplied by the provider.
+- Automatic refresh every 15 seconds and click-to-refresh controls; stale markers, unknown values, and an unavailable/retry state when data cannot be read.
 
-Codex usage is queried through a local Codex app-server process. The current helper contains a machine-specific executable path and must be adapted on other installations. Claude usage requires an external process to populate `~/.ai-usage-bridge/claude.json`; the package does not supply that process. Remote workspaces label these usage readings as local. Missing data does not imply unlimited quota.
+These are provider allowance readings, not per-project token consumption or remote-account usage. Selecting a remote workspace adds a **(local)** label: its machine name refers to the workspace, while the usage still comes from this computer.
+
+| Provider | Current setup requirement |
+| --- | --- |
+| Codex | A local authenticated Codex app-server. The helper currently contains a machine-specific executable path and PATH prefix; adapt these on other installations. |
+| Claude | An external process must populate `~/.ai-usage-bridge/claude.json` with usage windows and update/reset timestamps. The bridge process is not supplied by the package. |
+
+Missing data does not imply unlimited quota. Errors and readings older than five minutes mark the provider stale; expired or unavailable window data shows an unknown percentage rather than a fabricated allowance.
 
 ## Dialogs, search, and settings
 
@@ -165,7 +216,7 @@ Before publishing, run local native Herdr checks and exercise changed views. Rea
 
 ## Compatibility and documentation
 
-The inspected baseline is Herdr 0.1.13 on macOS. Linux remote endpoints have dedicated integration tests; Windows and broader remote behavior remain incompletely validated. Personal copies of Herdr interfaces require review after Herdr upgrades.
+Tested with Herdr 0.1.13 and 0.1.14 on macOS. Linux remote endpoints have dedicated integration tests; Windows and broader remote behavior remain incompletely validated. Personal copies of Herdr interfaces require review after Herdr upgrades.
 
 The current source includes Custom editor commands, directory-source selection, Markdown preview, and Claude bridge-file usage reporting.
 

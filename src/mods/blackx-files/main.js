@@ -1,3 +1,4 @@
+import { gitMarks } from "./git-status.js";
 import MarkdownContent from "./markdown-content.js";
 import { ignoredPaths } from "./git-ignore.js";
 import { writeDocument } from "./write-document.js";
@@ -136,13 +137,14 @@ export default class Files extends View {
           await this.loadFolder(path, context);
         }
         const top = await exec("git", ["rev-parse", "--show-toplevel"], { cwd, on }).catch(() => null);
-        const marks = {};
+        let marks = {};
         if (top?.code === 0) {
           // Writes nothing under .git (index lock, fsmonitor cookie): the folder watch would refresh again.
           const status = await exec("git", ["--no-optional-locks", "-c", "core.fsmonitor=false", "status", "--porcelain=v1", "-z", "--no-renames", "--untracked-files=all"], { cwd, on }).catch(() => null);
-          if (status?.code === 0) for (const entry of status.stdout.split("\0").filter(Boolean).slice(0, TOTAL)) {
-            const xy = entry.slice(0, 2);
-            marks[`${top.stdout.trim()}/${entry.slice(3)}`] = xy === "??" || xy.includes("A") ? "A" : xy.includes("U") ? "U" : xy.includes("D") ? "D" : "M";
+          if (status?.code === 0) {
+            const tree = await exec("git", ["ls-tree", "-r", "-d", "--name-only", "-z", "HEAD"], { cwd: top.stdout.trim(), on }).catch(() => null);
+            // With no initial commit every added directory is new.
+            marks = gitMarks(top.stdout.trim(), status.stdout, tree?.code === 0 ? tree.stdout : "", TOTAL);
           }
         }
         if (!this.current(context)) return;
@@ -310,7 +312,7 @@ export default class Files extends View {
       if (out.length >= TOTAL) break;
       if (!this.showHidden && entry.name.startsWith(".")) continue;
       const path = prefix ? `${prefix}/${entry.name}` : entry.name, open = this.folders.has(path), mark = this.marks[`${this.root}/${path}`];
-      const color = entry.ignored ? t.dim : t.foreground;
+      const color = entry.ignored ? t.dim : mark === "A" ? t.ansi2 : mark === "M" ? t.ansi3 : mark === "D" || mark === "U" ? t.ansi1 : t.foreground;
       out.push(h_flex().id(`file-${path}`).h(styles.components.files.fileRowHeight).flex_none().pl(styles.spacing.v8 + depth * styles.components.files.treeIndent).pr(styles.spacing.v8).gap(styles.spacing.v7).items_center().rounded(styles.radius.v0).cursor_pointer().text_color(color)
         .when(!entry.dir && this.file === path, el => el.bg(t.selected))
         .hover(s => s.bg(!entry.dir && this.file === path ? t.selected : t.hover))
@@ -320,8 +322,7 @@ export default class Files extends View {
           ? svg(open ? "folder-closed" : "folder").size(styles.components.files.glyph14).flex_none().text_color(color)
           : div().w(styles.components.files.glyph14).flex_none().font_family(styles.fonts.terminal).text_size(styles.components.files.glyph14).text_center().text_color(color).child(fileGlyph(entry.name)))
         .child(div().flex_1().min_w(0).truncate().child(entry.name))
-        .when(Boolean(mark), el => el.child(div().text_size(styles.components.files.captionText).text_color(mark === "A" ? t.ansi2 : mark === "D" || mark === "U" ? t.ansi1 : t.blocked).child(mark)))
-        .child(div().flex_none().text_size(styles.components.files.captionText).text_color(color).child(entry.dir ? entry.count == null ? "" : String(entry.count) : sizeLabel(entry.size))));
+        .child(div().flex_none().text_size(styles.components.files.captionText).text_color(entry.ignored ? t.dim : t.foreground).child(entry.dir ? entry.count == null ? "" : String(entry.count) : sizeLabel(entry.size))));
       if (entry.dir && open) this.rows(path, depth + 1, out, t);
     }
     return out;

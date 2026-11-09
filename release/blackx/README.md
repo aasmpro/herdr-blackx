@@ -1,8 +1,38 @@
 # blackx
 
-A native Herdr layout with the blackx theme and 21 namespaced `blackx-*` mods.
+A black Herdr workspace for local projects and remote machines. Configure how files open, copy them between computers, and keep provider usage in view—all through 21 native blackx mods.
 
 ![blackx running in Herdr](preview.png)
+
+## Configure your workflow
+
+Open **Settings → blackx** to choose a directory source and editor. Stay with the workspace folder, follow the active terminal, or use a custom absolute directory; Files and Changes share the choice. Open source in the built-in editor, use `$EDITOR`, or supply a custom command. External editors launch on the file’s machine in a new Herdr tab, with the path appended automatically.
+
+Built-in mode offers Save/Cmd-S, retained drafts, conflict checks, line wrapping, and Markdown preview. External modes give the file tree the full panel width.
+
+![blackx directory and editor configuration](screenshots/configs.png)
+
+## Copy on a server, paste locally
+
+1. Open Files in a connected server workspace and right-click **Copy** on a file or folder.
+2. Switch to your local workspace and navigate to the destination folder.
+3. Right-click **Paste**. If the name already exists, choose Replace, Keep both, or Cancel.
+
+The same workflow works from local to server or between servers. Blackx’s shared file clipboard remembers the source machine across workspace switches. **Copy path** is separate and copies only a text path.
+
+Transfers use your existing Herdr connections, chunked snapshots, and destination checksums. Copy retains the original; Move checks the source before removal. Failed transfers retain sources and report recovery staging paths when applicable. Machines must already be connected and have Python 3 available.
+
+![Remote workspace with its server Files tree](screenshots/machine.png)
+
+Copy, Move, Paste, and file-management actions are available directly in the Files context menu.
+
+![The blackx Files context menu](screenshots/files.png)
+
+## Keep usage in view
+
+The status bar follows the focused program with **Claude or Codex usage**, remaining percentages, reset countdowns, and Codex credits when reported. It refreshes every 15 seconds and on click, alongside machine, branch, and agent-attention information. Stale or unavailable readings are marked.
+
+Provider readings are **local**, including while a remote workspace is selected; the bar adds a local label. Codex needs an authenticated local app-server and adaptation of the helper’s machine-specific executable path. Claude needs an external process writing `~/.ai-usage-bridge/claude.json`; that bridge is not bundled. These readings describe provider allowances, not usage per project or remote account.
 
 ## Install
 
@@ -22,7 +52,7 @@ Leave `README.md`, `RECIPE.md`, and `preview.png` outside the app home. Current 
 
 ## Dependencies and access
 
-Baseline: Herdr 0.1.13. Uses native GPUI/gpui-base APIs and Herdr overlays. Git provides status/diffs; Commit explicitly runs `git add -A` then `git commit`. Directory browsing uses sh or PowerShell locally or on the selected machine. File operations and transfers use Python 3 and hc; Linux Trash needs gio. Saves write project files with conflict checks. Machine controls use hc and configured network connections; worktree operations may fetch through Git. Usage runs Python 3: Codex starts a local app-server and reads account rate limits, while Claude reads `~/.ai-usage-bridge/claude.json`. The current Codex helper has a machine-specific executable path; adapt it for another installation. No credentials or usage data are bundled. Feedback sends only through Herdr's API after the person clicks Send; updates use Herdr's built-in APIs.
+Tested with Herdr 0.1.13 and 0.1.14 on macOS. Uses native GPUI/gpui-base APIs and Herdr overlays. Git provides status/diffs; Commit explicitly runs `git add -A` then `git commit`. Directory browsing uses sh or PowerShell locally or on the selected machine. File operations and transfers use Python 3 and hc; Linux Trash needs gio. Saves write project files with conflict checks. Machine controls use hc and configured network connections; worktree operations may fetch through Git. Usage runs Python 3: Codex starts a local app-server and reads account rate limits, while Claude reads `~/.ai-usage-bridge/claude.json`. The current Codex helper has a machine-specific executable path; adapt it for another installation. No credentials or usage data are bundled. Feedback sends only through Herdr's API after the person clicks Send; updates use Herdr's built-in APIs.
 
 ## Share
 
@@ -58,7 +88,26 @@ Choose Built-in, System default, or Custom under Settings → blackx. Built-in e
 
 Directory source can use the workspace path, follow the terminal, or use a custom absolute path on the workspace's machine. This applies to Files and Changes.
 
-In either external editor mode, Files shows only the full-width tree; the content column and divider are hidden. Selecting a file still opens the system editor in a new tab. Built-in mode restores the split view and its saved tree width. Launch errors remain visible below the tree.
+In either external editor mode, Files shows only the full-width tree; the content column and divider are hidden. Selecting a file opens the chosen external editor in a new tab. Built-in mode restores the split view and its saved tree width. Launch errors remain visible below the tree.
+
+### Git colors in the file tree
+
+Git status appears through filename and icon colors, without A/M/D/U letter badges. File sizes and directory counts keep their neutral styling.
+
+| Item | Color |
+| --- | --- |
+| Modified file | Yellow |
+| Added or untracked file | Green |
+| Existing directory containing changed or added descendants | Yellow |
+| New directory containing added/untracked files | Green |
+| File with a deletion or conflict status | Red |
+| Unchanged file or directory | Normal foreground |
+| Git-ignored entry | Dimmed |
+
+Directory colors propagate through every parent, including collapsed folders. For example, adding `src/new-folder/file.txt` makes an existing `src` yellow, while the new `new-folder` and `file.txt` are green. A modification to an existing nested file makes its existing ancestor directories yellow. Once changes are committed or reverted and the tree refreshes, clean entries return to their normal color.
+
+“Existing” means present in Git’s last commit. Git does not track empty directories, so a previously empty folder receiving its first untracked file is treated as new. Before the first commit, added directories are green. Colors use the active theme’s ANSI palette; blackx-mono renders these roles in grayscale. Selection and hover backgrounds remain unchanged.
+
 
 Directory-tree icons use Nerd Fonts 3.5.1 glyphs from the bundled JetBrainsMono Nerd Font, with 110 extension mappings, special config/manifest filenames, open/closed folders, and a generic fallback. Labels and glyphs retain muted monochrome styling. Other controls continue using Lucide and the selected brand marks.
 

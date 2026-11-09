@@ -54,11 +54,11 @@ def outputs(root=ROOT):
         files[f'mods/{name}/style.js'] = (src / 'shared/style.js').read_text().replace('__STYLE_TOKENS__', json.dumps(tokens, indent=2)).encode()
     for source, target in [('layout.json', 'layouts/blackx.json'), ('theme.json', 'themes/blackx.json'), ('theme-mono.json', 'themes/blackx-mono.json')]:
         files[target] = json_bytes(resolve(read_json(src / source), tokens))
-    for source, target in [('src/README.md', 'README.md'), ('src/RECIPE.md', 'RECIPE.md'), ('docs/screenshots/preview.png', 'preview.png')]:
+    for source, target in [('src/README.md', 'README.md'), ('src/RECIPE.md', 'RECIPE.md'), ('docs/screenshots/preview.png', 'preview.png'), ('docs/screenshots/configs.png', 'screenshots/configs.png'), ('docs/screenshots/machine.png', 'screenshots/machine.png'), ('docs/screenshots/files.png', 'screenshots/files.png')]:
         if (root / source).exists():
             files[target] = (root / source).read_bytes()
             if target in ('README.md', 'RECIPE.md'):
-                files[target] = files[target].replace(b'](../docs/screenshots/preview.png)', b'](preview.png)')
+                files[target] = files[target].replace(b'](../docs/screenshots/preview.png)', b'](preview.png)').replace(b'](../docs/screenshots/', b'](screenshots/')
     for theme_name, ansi in [('blackx', tokens['terminal']['ansi']), ('blackx-mono', tokens['monochrome']['ansi'])]:
         rules = [{'settings': {'background': tokens['colors']['background'], 'foreground': tokens['colors']['foreground'], 'selection': tokens['colors']['selection'], 'caret': tokens['colors']['foreground']}}]
         for scope, index in [('keyword, storage', 13), ('string', 10), ('constant.numeric, constant.language', 11), ('entity.name.function, support.function', 12), ('entity.name.type, support.type, support.class', 11), ('variable, entity.other.attribute-name', 14), ('invalid, markup.deleted', 9), ('markup.inserted', 10), ('markup.heading', 12)]:

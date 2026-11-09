@@ -33,3 +33,7 @@ Native layout structure lives in `src/layout.json`; use `$ref` for its visual va
 For each edit: build, run tests, check every affected mod with `herdr-app check`, install, inspect status/errors, then exercise the changed view. Initial-render checks do not cover async states or deferred virtual rows. Windows, remote-machine paths and every agent lifecycle state require their own runtime validation before a broader compatibility claim.
 
 Text selection targets the active directory row color (`#282828`). Native inputs compensate for their 50% selection blend. Herdr’s native content editor additionally dims selections according to focus; the installed API does not expose that opacity, so editor highlights can appear darker than the selected tree row.
+
+## File-tree status colors
+
+File labels and icons use the reactive theme’s `ansi3` for modified, `ansi2` for added/untracked, and `ansi1` for conflict/deletion statuses. Existing directories with changed descendants use `ansi3`; new directories use `ansi2`, propagated through ancestors. Ignored entries use `dim`; size/count text stays neutral. There are no Git status letter badges. These roles follow the active palette, including grayscale in blackx-mono.

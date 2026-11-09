@@ -58,7 +58,7 @@ Publish this repository publicly and add the topic `herdr-layout` for Herdr disc
 
 `src/RECIPE.md` explains visuals, behavior, APIs, external commands, dependencies and checks. The maintained screenshot is `docs/screenshots/preview.png`; the builder copies it to `release/blackx/preview.png`. It is an actual capture of the running Herdr UI. Private screenshots, rollback backups and migration data remain outside the package and ignored by Git.
 
-Validated baseline: Herdr 0.1.13 on macOS. Broader Windows/remote compatibility is not yet validated. Preserve clone provenance and review the redistribution terms of upstream code and artwork before public release; this repository does not assert a new license for them.
+Tested with Herdr 0.1.13 and 0.1.14 on macOS. Broader Windows/remote compatibility is not yet validated. Preserve clone provenance and review the redistribution terms of upstream code and artwork before public release; this repository does not assert a new license for them.
 
 ## Rollback
 
@@ -123,3 +123,9 @@ Cross-machine copies use private per-file snapshots and 2 MiB chunks to stay bel
 ## Current configuration fragments
 
 `preferences/settings.fragment.json` contains the current blackx settings (palette overrides, fonts, zoom, appearance, ligatures, contrast and sounds). `preferences/keys.fragment.json` contains the current global, terminal and blackx shortcut configuration. Merge selected values into personal files; do not replace unrelated settings or bindings. Root `keys.json` remains the minimal blackx-only shortcut fragment. Runtime workspace state, machine connections and backups are not part of the portable package.
+
+## File-tree Git status
+
+`src/mods/blackx-files/git-status.js` combines porcelain status with committed directories from `git ls-tree HEAD`. It marks existing changed ancestors as modified and new ancestors as added, even when collapsed. It uses read-only Git commands and does not stage files. Rendering uses ANSI yellow/green/red for modified/added/conflicted-or-deleted files, while directory changes use yellow or green; ignored entries remain dim and sizes/counts neutral.
+
+`node tests/directory-status.cjs` checks real repositories, nested paths, staged/untracked additions and unborn repositories. `node tests/file-status-colors.cjs` checks row colors, badge removal, ignored entries, neutral sizes, and selection preservation. Both run through `make test`.

@@ -1,6 +1,6 @@
 # blackx
 
-A native, flat black Herdr workspace with compact spaces and agent lists on the left, tabs and terminal splits in the center, project tools on the right, and a slim status bar. White and gray controls keep attention on terminal output; choose colored blackx or grayscale blackx-mono terminal palettes.
+A native, flat black Herdr workspace for local projects and remote machines: configure where Files looks and how files open, copy a folder from a server and paste it locally, and watch remaining agent usage in a slim status bar. Compact spaces and agents sit on the left, terminals in the center, and project tools on the right.
 
 ![blackx](preview.png)
 
@@ -16,6 +16,16 @@ Left to right and top to bottom:
 - A right panel, initially hidden, 368px wide with a 280px minimum. Files contains a directory tree and a content viewer/editor separated by a draggable divider. External editor modes show the tree alone. Changes contains changed files, a line-numbered diff, and a commit-message area. Diff rows are 20px high.
 - A 28px bottom bar showing machine, available branch, agent and attention counts, a command shortcut hint, and available usage percentages/reset countdowns.
 
+The blackx configuration screen groups Directory source (Workspace, Terminal, Custom) and Editor (Built-in, System default, Custom), with a text field revealed for custom choices. It uses the same flat black controls and selected-state treatment as the rest of the interface.
+
+![blackx configuration menu](screenshots/configs.png)
+
+Remote workspaces remain grouped by machine, and Files shows the selected server’s directory. The footer identifies that machine while labeling provider usage as local.
+
+![Server workspace and Files tree](screenshots/machine.png)
+
+![The Files context menu and its file actions](screenshots/files.png)
+
 Menus have monochrome action icons and thin borders. Workspace/tab add menus and the Files context menu have 5px internal padding. Bundle Lucide interface icons, Lobe marks for Codex/Claude/Pi/OpenCode, and Nerd Font file glyphs with 110 extension mappings and special filenames. Preserve font/icon licenses. Optional preferences reproduce 1.1 zoom and disabled ligatures; existing saved widths may override defaults.
 
 ## How it behaves
@@ -24,15 +34,15 @@ Menus have monochrome action icons and thin borders. Workspace/tab add menus and
 
 **Tabs and panes.** The add menu starts a terminal or installed agent; the workspace add menu offers workspace/worktree actions. Pane hover reveals split right/down, zoom/restore, and close. Menus act on the clicked target rather than assuming keyboard focus. Tab/workspace closure opens a confirmation explaining that its terminals end. Closing a pane uses Herdr's normal close action. Pane right-click routing can be switched between Herdr and the terminal application. Panel selection is remembered per workspace.
 
-**Files and editing.** Directory source has Workspace, Terminal, and Custom modes. Workspace uses the first live terminal directory, falling back to the workspace folder. Terminal follows the focused terminal and remembers a usable directory. Custom requires an absolute path on the workspace's machine. Changes uses the same directory selection. Remember expanded folders, selected files, hidden-file preference, tree width, and line wrapping. Watch local directories and refresh periodically; remote directories use polling. Dim ignored entries while retaining file status marks.
+**Files and editing.** Directory source has Workspace, Terminal, and Custom modes. Workspace uses the first live terminal directory, falling back to the workspace folder. Terminal follows the focused terminal and remembers a usable directory. Custom requires an absolute path on the workspace's machine. Changes uses the same directory selection. Remember expanded folders, selected files, hidden-file preference, tree width, and line wrapping. Watch local directories and refresh periodically; remote directories use polling. Dim ignored entries. Color modified file labels/icons with the theme’s yellow and added/untracked files with green; conflicts/deletions use red. Omit Git status letter badges and keep size/count text neutral. Colors follow the active palette. Directory colors propagate through all ancestors: directories present in the last commit show yellow when descendants change; new directories show green. Git does not track empty directories; a previously empty folder with its first untracked file counts as new, as do added directories before the first commit. For example, adding `src/new-folder/file.txt` makes committed `src` yellow and the new folder/file green. Refreshing clean status clears these colors. The monochrome palette renders the same roles in grayscale.
 
 Click folders to expand and files to open. Built-in mode provides editable source, Save/Cmd-S, wrapping, and a Markdown preview toggle. Retain drafts and show conflicts or save errors without discarding edits. Large text becomes a truncated read-only preview; binary content shows an explanation. System default uses the file machine's editor preference; Custom uses a supplied command. External editors launch in a new tab with the file path appended, only after a deliberate file-opening action. Do not launch from passive refresh/restoration. Require dirty native drafts to be saved first.
 
-**File operations.** Icon rows offer Add file, Add folder, Rename, Copy, Copy path, Move, Paste, Reveal, and Delete. Creation targets a folder, a file's parent, or the tree root. Creation/rename never overwrite existing entries; Enter submits and Cancel dismisses, with input retained on failure. Rename retargets the selection, expanded folders, and drafts. Copy/Move share a file clipboard; Copy path writes text to the system clipboard. Reveal is local-only. Paste uses the clicked destination; duplicates offer Replace/Keep both/Cancel. Same-folder Copy offers Keep both/Cancel, while same-folder Move is a no-op. Reject real descendant destinations. Delete confirms and uses system Trash.
+**File operations.** The primary cross-machine workflow is: open a connected server workspace, Copy a file or folder in Files, switch to a local workspace, and Paste into its destination folder. Support the reverse direction and server-to-server transfers identically. The shared clipboard must retain the source path, machine, and Copy/Move intent across workspace changes; Copy path instead writes only path text. Icon rows offer Add file, Add folder, Rename, Copy, Copy path, Move, Paste, Reveal, and Delete. Creation targets a folder, a file's parent, or the tree root. Creation/rename never overwrite existing entries; Enter submits and Cancel dismisses, with input retained on failure. Rename retargets the selection, expanded folders, and drafts. Copy/Move share a file clipboard; Copy path writes text to the system clipboard. Reveal is local-only. Paste uses the clicked destination; duplicates offer Replace/Keep both/Cancel. Same-folder Copy offers Keep both/Cancel, while same-folder Move is a no-op. Reject real descendant destinations. Delete confirms and uses system Trash.
 
 Transfers work locally and through connected machines, verify content, and keep sources after failure. Report recovery staging paths. Preserve symlinks and expand cross-machine hard links into ordinary files. Warn about skipped runtime entries or files disappearing during Copy. Move applies stricter source-change checks and retains sources with uncopied runtime entries.
 
-**Changes and usage.** Show changed/untracked paths, counts, and bounded text diffs, including repositories without an initial commit. Commit requires an explicit click and a message, stages all changes, then commits. Usage follows the focused program: Claude or otherwise Codex. Show remaining percentages and reset countdowns when available, stale/unavailable states otherwise. Refresh every 15 seconds and on click. Usage is local even when viewing a remote workspace, and is labeled accordingly.
+**Changes and usage.** Show changed/untracked paths, counts, and bounded text diffs, including repositories without an initial commit. Commit requires an explicit click and a message, stages all changes, then commits. Usage follows the focused program: Claude or otherwise Codex, with separate cached readings. Display remaining allowance (100 minus reported used percent), primary/secondary reset countdowns, and Codex credits or an unlimited-credit indicator when reported. Show unknown percentages for expired/unavailable window data, and mark errors or readings older than five minutes stale. Refresh every 15 seconds and on click. This is provider allowance, not per-project consumption. Usage is local even when viewing a remote workspace, and is labeled accordingly.
 
 **Secondary screens.** Provide styled settings, fuzzy command palette with recent commands, workspace/tab picker, searchable keybinding help, prompts, confirmations, worktree and machine dialogs, welcome, release notes, and feedback with optional screenshots. Feedback sends only on explicit submission. Route blackx actions through these screens; direct CLI/OS menu actions may still open Herdr defaults.
 
@@ -40,7 +50,7 @@ Merge only the desired shortcuts: Cmd-comma settings, Cmd-Shift-P palette, Cmd-P
 
 ## Built from
 
-Build a native package with `layouts/blackx.json`, `mods/blackx-*/`, `themes/blackx.json`, `themes/blackx-mono.json`, `keys.json`, this recipe, and `preview.png`. Optional integration, preference, and program-icon fragments can accompany it. Installation requires no builder. Each mod has a default-exported View, a `mod.json`, and local resolved style/icon/helper modules; no runtime cross-mod code imports are required.
+Build a native package with `layouts/blackx.json`, `mods/blackx-*/`, `themes/blackx.json`, `themes/blackx-mono.json`, `keys.json`, this recipe, and `preview.png`. Include the configuration, machine, and Files context-menu screenshots under `screenshots/` so the package README and recipe remain readable without the source repository. Optional integration, preference, and program-icon fragments can accompany it. Installation requires no builder. Each mod has a default-exported View, a `mod.json`, and local resolved style/icon/helper modules; no runtime cross-mod code imports are required.
 
 The layout is a root row: sidebar column (`brand`, `sidebar-lists/spaces`) and work column (`tabs`, `work-body`, `status`). The spaces block uses blackx-agents, which composes the space list. Work-body is a row of the active-tab terminal tree and an initially hidden panel column whose stack contains Files and Changes. Pane headers use blackx-pane. Hide the system title bar, position macOS traffic lights at [12,16], and use blackx-menu for terminal context menus.
 
@@ -82,7 +92,7 @@ Bundle unmodified JetBrainsMono Nerd Font (Nerd Fonts 3.5.1/upstream 2.304), Luc
 
 ## Watch out
 
-Baseline is Herdr 0.1.13 on macOS. Linux remote endpoints have integration tests; Windows is not comprehensively validated. Read the installed API/manual for another version and clone shipped components rather than editing app-owned files. Keep node IDs, mod names, shared keys and storage names stable where persistence matters. Merge shortcuts and program-icon preferences; do not overwrite unrelated bindings, launch commands, or settings.
+Tested with Herdr 0.1.13 and 0.1.14 on macOS. Original clone provenance remains 0.1.13. Linux remote endpoints have integration tests; Windows is not comprehensively validated. Read the installed API/manual for another version and clone shipped components rather than editing app-owned files. Keep node IDs, mod names, shared keys and storage names stable where persistence matters. Merge shortcuts and program-icon preferences; do not overwrite unrelated bindings, launch commands, or settings.
 
 The Codex executable path above is machine-specific and needs adaptation on another installation. Claude's bridge is not bundled. External editor commands accept executable/quoted arguments, not shell operators or substitution; an unset editor reports an error with no fallback. The current external-editor lookup uses sh, so Windows editor launching needs separate validation. Custom directory paths must be absolute. Preserve the selected workspace's machine when reading or executing remotely; remote usage readings are still local.
 
@@ -97,9 +107,11 @@ This brief is self-contained: a fresh implementation must not need the maintaine
 - All 21 installed mods pass `herdr-app check`; switching to blackx renders without new runtime errors.
 - Expanded/compact sidebar, pane hover controls, tabs, panel switching, both palettes, and all four agent states render correctly. Agent sorting/pinning/sub-agent navigation works without disruptive reordering.
 - Blackx menus show matching icons, borders, hover/disabled states and 5px Files/add-menu padding. Close-tab/workspace confirmations cancel safely and target the intended item.
+- File-tree colors cover modified/added files, existing ancestors with newly added descendants, new nested folders, staged additions, and repositories with no commits. Verify propagation while collapsed, neutral sizes/counts, dimmed ignored entries, unchanged selection backgrounds, and clearing after commit/revert.
 - Files follows each directory mode on the correct machine. Built-in Save/Cmd-S, Markdown preview and wrapping work; external editors launch only from deliberate actions. Conflicts and failures preserve drafts.
 - Create, rename, copy, move, duplicate, paste and Trash behave as described; test local and available remote endpoints, hashes, Unicode/symlinks, same-folder operations and failure recovery separately.
 - Changes handles new and existing repositories, aligned diff scrolling and binary/limit messages; explicit Commit stages all changes and commits the supplied message.
-- Usage refresh/countdowns, unavailable and stale states work with available providers; local data is labeled on remote workspaces. Optional themes/settings do not replace unrelated preferences.
+- Copy a server file/folder, switch to a local workspace, and Paste successfully; verify the reverse and server-to-server flow on connected test endpoints. The file clipboard retains its source machine, while Copy path produces text only.
+- Usage refresh/countdowns, credits when available, unavailable and stale states work with available providers; local data is labeled on remote workspaces. Optional themes/settings do not replace unrelated preferences.
 - Settings, help, palette, picker, worktree/machine dialogs and secondary screens open; feedback is not sent without explicit submission.
 - The package folder contains its layout, all mod dependencies, both themes, shortcut fragment, recipe, licenses and real preview. Local build/check/tests reproduce the generated package; supported-platform claims match actual runtime verification.
